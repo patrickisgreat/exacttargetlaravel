@@ -160,7 +160,9 @@ Next, update Composer from the Terminal:
     composer update --dev
 
 
-Next, You will have to fill out your Client ID and Client Secret into the `.env` file included with this package AS WELL as the `config.php` file under `vendor/exacttarget/fuel-sdk-php/config.php`.
+Next, You will have to fill out your CLIENT_ID and CLIENT_SECRET into the `.env` file included with this package AS WELL as fill out the same variables and rename the file `config.php.template` that gets installed as a dependancy in your PROJECT's vendor folder under `vendor/exacttarget/fuel-sdk-php/config.php.template`.
+
+As soon as the Exact Target REST api gets more flushed out with more Data Event endpoints I will deprecate the SOAP methods and use of the Fuel SDK.
 
 Now just write a use statement at the top of your Laravel project like so:
 
