@@ -1,0 +1,26 @@
+{
+    "name": "digitaladditive/exacttarget-laravel",
+    "description": "The best way to talk to Exact Target with Hypertext PreProcessor",
+    "license": "MIT",
+    "keywords": ["exacttarget-laravel"],
+    "authors": [
+        {
+            "name": "Patrick Bennett",
+            "email": "patrick.bennett@digitaladditive.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.0",
+        "exacttarget/fuel-sdk-php": "^0.9.0"
+        },
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*",
+        "guzzlehttp/guzzle": "^6.0",
+        "exacttarget/fuel-sdk-php": "^0.9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "digitaladditive\\exacttargetlaravel\\": "src"
+        }
+    }
+}
