@@ -159,6 +159,9 @@ Next, update Composer from the Terminal:
 
     composer update --dev
 
+
+Next, You will have to fill out your Client ID and Client Secret into the .env file included with this package AS WELL as the config.php file under "vendor/exacttarget/fuel-sdk-php/config.php".
+
 Now just write a use statement at the top of your Laravel project like so:
 
 	use digitaladditive\exacttargetlaravel\LaravelEtApi;
