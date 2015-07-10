@@ -10,7 +10,9 @@ This is a work in progress and there are many more endpoints to make methods for
 
 This build includes one implementation for Laravel. 
 
-```interface EtInterface {
+```php
+
+interface EtInterface {
 
     /**
      * reaches out to Exact Target Rest API with client secret and Id
@@ -147,9 +149,11 @@ This build includes one implementation for Laravel.
 
 Begin by installing this package through Composer. Edit your project's `composer.json` file to require `digitaladditive/exacttargetlaravel`. Or just run composer require digitaladditive/exacttargetlaravel
 
-	```"require-dev": {
+	```
+	"require-dev": {
 		"digitaladditive/exacttargetlaravel": "~0.1"
-	}```
+	}
+	```
 
 
 Next, update Composer from the Terminal:
@@ -161,7 +165,8 @@ Next, update Composer from the Terminal:
 
 A few usage examples
 
-```/* asynchronously upsert a batch of Rows to a DE*/
+```php
+/* asynchronously upsert a batch of Rows to a DE*/
 return $this->etConnect()->asyncUpsertRowset(["primaryKey" => 1], ["emailAddress" => "newemail@newemail.com"], 'TestingRest  ');
 
 /* upsert a single row to a DE */
