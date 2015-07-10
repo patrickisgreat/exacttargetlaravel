@@ -61,14 +61,11 @@ class LaravelEtApi implements EtInterface {
      * @param ET_DataExtension_Row $fuelDe
      * @param ET_DataExtension_Column $fuelDeColumn
      */
-    function __construct(Client $client, Headers $headers, ET_Client $fuel, ET_DataExtension_Row $fuelDe, ET_DataExtension_Column $fuelDeColumn, ET_DataExtension $fuelDext)
+    function __construct(Client $client, ET_Client $fuel, ET_DataExtension_Row $fuelDe, ET_DataExtension_Column $fuelDeColumn, ET_DataExtension $fuelDext)
     {
 
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
         $this->client = $client;
-        /*$this->tokenClient = new Client($this->getTokenUri,[
-           'adapter' => 'Zend\Http\Client\Adapter\Curl'
-        ]);*/
         $this->headers = $headers;
         $this->fuelDeColumn = $fuelDeColumn;
         $this->fuel = $fuel;

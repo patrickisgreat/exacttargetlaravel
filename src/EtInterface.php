@@ -127,6 +127,6 @@ interface EtInterface {
      * @param $deStructures
      * @return array (response)
      */
-	public function createDe($deStructures)
+	public function createDe($deStructures);
 
 }
