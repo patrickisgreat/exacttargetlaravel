@@ -1,15 +1,16 @@
-# API for Exact Target for use in Object Oriented PHP Applications
+# API for Exact Target for use in Laravel and Other PHP MVC frameworks
 
-[![Build Status](https://travis-ci.org/JeffreyWay/Laravel-4-Generators.png?branch=master)](https://travis-ci.org/JeffreyWay/Laravel-4-Generators)
+[![Build Status](https://travis-ci.org/JeffreyWay/Laravel-4-Generators.png?branch=master)](https://travis-ci.org/digitaladditive/exacttargetlaravel)
 
 This Laravel package provides a series of methods for clean and easy interaction with the burdgeoning Exact Target REST API as well as methods for use with Fuel SDK
 
 It implements the following Contract which explains what is currently available for use in your Controllers or models.
 You can get a good idea of what each one will do just from the comments. 
-This is a work in progress and there are many more endpoints to make methods for
+This is a work in progress and there are many more endpoints to make methods for. 
 
-```php
-interface EtInterface {
+This build includes one implementation for Laravel. 
+
+```interface EtInterface {
 
     /**
      * reaches out to Exact Target Rest API with client secret and Id
@@ -160,23 +161,19 @@ Next, update Composer from the Terminal:
 
 A few usage examples
 
-```
-// asynchronously upsert a batch of Rows to a DE
+```/* asynchronously upsert a batch of Rows to a DE*/
 return $this->etConnect()->asyncUpsertRowset(["primaryKey" => 1], ["emailAddress" => "newemail@newemail.com"], 'TestingRest  ');
 
-// upsert a single row to a DE
+/* upsert a single row to a DE */
 return $this->etConnect()->upsertRow('primaryKey', 1, ['emailAddress' => 'oncemore@oncemore.com'], 'TestingRest');
 
-// Validate an Email address
+/* Validate an Email address */
 return $this->etConnect()->validateEmail('patrickisgreat@gmail.com');
 
-// Delete a Row from a DE
+/* Delete a Row from a DE */
 return $this->etConnect()->deleteRow('TestingRest', ['primaryKey' => 1]);
 
-//example of building a batch of rows from Laravel Models
-
-```
-```
+/* example of building a batch of rows from Laravel Models */ 
 public function upsertRowsetExample()
     {
         //master array for one loop
@@ -233,5 +230,5 @@ public function upsertRowsetExample()
 
 
         }
-    }
+ }
 ```
