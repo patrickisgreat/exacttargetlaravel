@@ -160,8 +160,8 @@ Next, update Composer from the Terminal:
     composer update --dev
 
 
-Next, You will have to fill out your CLIENT_ID and CLIENT_SECRET into the `.env` file included with this package in this package's root directory. You MUST also fill out the same variables and rename the file `config.php.template` that gets installed as a dependancy in your PROJECT's vendor folder under `vendor/exacttarget/fuel-sdk-php/config.php.template`.
-	Also included with this package is a directory called `wsdl` which includes a file called `ExactTargetWSDL.xml`. Copy this directory into `vendor/exacttarget/fuel-sdk-php/`, and update the config file's `xmlloc` variable to the following value: `'xmlloc' => __DIR__.'/wsdl/ExactTargetWSDL.xml'`.
+Next, You will have to fill out your CLIENT_ID and CLIENT_SECRET into the config.php file included with this package in this package's root directory. You MUST also fill out the same variables and rename the file `config.php.template` that gets installed along with this package's dependancy -- Fuel SDK -- in your PROJECT's vendor folder under `vendor/exacttarget/fuel-sdk-php/config.php.template`.
+	Also included with this package is a directory called `wsdl` which includes a file called `ExactTargetWSDL.xml`. Copy this directory and it's contents into `vendor/exacttarget/fuel-sdk-php/`, and update the config file's `xmlloc` variable to the following value: `'xmlloc' => __DIR__.'/wsdl/ExactTargetWSDL.xml'`.
 
 I know this is a bit of a pain in terms of configuration. As soon as the Exact Target REST api gets more flushed out with more Data Event endpoints I will deprecate the SOAP methods and use of the Fuel SDK. At that time most of the above configuration will not be necessary. 
 

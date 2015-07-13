@@ -66,15 +66,25 @@ class LaravelEtApi implements EtInterface {
 
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
         $this->client = $client;
-        $this->headers = $headers;
         $this->fuelDeColumn = $fuelDeColumn;
         $this->fuel = $fuel;
         $this->fuelDe = $fuelDe;
         $this->fuelDext = $fuelDext;
-        $this->clientId = env('CLIENT_ID', 'default');
-        $this->clientSecret = env('CLIENT_SECRET', 'default');
+        $this->config = $this->getConfig();
+        $this->clientId = $this->config['clientid'];
+        $this->clientSecret = $this->config['clientsecret'];
         $this->accessToken = $this->getToken($this->clientId, $this->clientSecret, $this->getTokenUri);
 
+    }
+
+    public function getConfig()
+    {
+        if (file_exists(__DIR__ .'/../config.php'))
+        {
+            $config = include __DIR__ .'/../config.php';
+
+        }
+        return $config;
     }
 
 
