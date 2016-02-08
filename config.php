@@ -1,5 +1,7 @@
 <?php
-return array(
-    'clientid' => 'FILL OUT CLIENT ID',
-    'clientsecret' => 'FILL OUT CLIENT SECRET'
-);
+            return array(
+                'clientid' => 'testingThis
+',
+                'clientsecret' => 'testingThis
+'
+            );

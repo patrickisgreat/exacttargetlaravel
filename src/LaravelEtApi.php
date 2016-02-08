@@ -1,4 +1,4 @@
-<?php namespace digitaladditive\exacttargetlaravel;
+<?php
 
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Client;
@@ -278,10 +278,23 @@ class LaravelEtApi implements EtInterface {
 
         if ($getRes->status == true)
         {
+            dd($getRes->OverallStatus);
             return $getRes;
         }
 
         return print 'Message: '.$getRes->message."\n";
+
+        /*while ($results->OverallStatus=="MoreDataAvailable") {
+            $rr = new ExactTarget_RetrieveRequest();
+            $rr->ContinueRequest = $results->RequestID;
+            $rrm = new ExactTarget_RetrieveRequestMsg();
+            $rrm->RetrieveRequest = $rr;
+            $results = null;
+            $results = $client->Retrieve($rrm);
+            $tempRequestID = $results->RequestID;
+            print_r($results->OverallStatus.' : '.$results->RequestID.' : '.count($results->Results));
+            print_r('<br>');
+        }*/
     }
 
     /**
@@ -477,6 +490,7 @@ class LaravelEtApi implements EtInterface {
         ]);
 
         $response = $this->client->post('https://www.exacttargetapis.com/address/v1/validateEmail', $request);
+
         $responseBody = json_decode($response->getBody());
 
         return compact('responseBody');
