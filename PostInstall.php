@@ -1,7 +1,10 @@
 <?php
 
+namespace digitaladditive\exacttargetlaravel;
 
-function initConfig()
+class PostInstall {
+
+   public static function initConfig()
     {
         // @todo needs a timer for inputs. If the user doesn't make any keystrokes within a certain period of time the script exits
         echo "Please enter the Exact Target Client ID you wish to use, Hit Enter to proceed: ";
@@ -31,5 +34,7 @@ function initConfig()
         file_put_contents($etApiConfigFile, $template);
 
     }
+}
+
 
 ?>
