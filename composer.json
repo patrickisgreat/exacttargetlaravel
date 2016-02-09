@@ -24,7 +24,7 @@
         }
     },
     "scripts": {
-    "post-install-cmd": [
+    "post-package-install": [
       "digitaladditive\\exacttargetlaravel\\PostInstall::sayHello"
     ]
   }
