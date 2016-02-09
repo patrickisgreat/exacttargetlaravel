@@ -2,9 +2,11 @@
 
 namespace digitaladditive\exacttargetlaravel;
 
+use ComposerScriptEvent;
+
 class PostInstall {
 
-   public static function initConfig()
+   public static function initConfig(Event $event)
     {
         // @todo needs a timer for inputs. If the user doesn't make any keystrokes within a certain period of time the script exits
         echo "Please enter the Exact Target Client ID you wish to use, Hit Enter to proceed: ";
@@ -35,7 +37,7 @@ class PostInstall {
 
     }
 
-    public static function sayHello()
+    public static function sayHello(Event $event)
     {
         print 'I am in ' . __METHOD__ . PHP_EOL;
     }
