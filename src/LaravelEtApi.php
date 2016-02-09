@@ -1,14 +1,16 @@
 <?php
 
+namespace digitaladditive\exacttargetlaravel;
+
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Request;
-use ET_Client;
-use ET_DataExtension;
-use ET_DataExtension_Row;
 use ET_DataExtension_Column;
+use ET_DataExtension_Row;
+use GuzzleHttp\Client;
+use ET_DataExtension;
+use ET_Client;
 
 /**
  * Class EtApi
