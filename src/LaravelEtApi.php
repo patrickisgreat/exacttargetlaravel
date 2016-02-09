@@ -1,5 +1,7 @@
 <?php
 
+namespace digitaladditive\exacttargetlaravel;
+
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;

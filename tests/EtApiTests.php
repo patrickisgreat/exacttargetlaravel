@@ -1,4 +1,6 @@
 <?php
+
+namespace digitaladditive\exacttargetlaravel;
  
 use digitaladditive\exacttargetlaravel\LaravelEtApi;
  
