@@ -34,6 +34,11 @@ class PostInstall {
         file_put_contents($etApiConfigFile, $template);
 
     }
+
+    public static function sayHello()
+    {
+        print 'I am in ' . __METHOD__ . PHP_EOL;
+    }
 }
 
 

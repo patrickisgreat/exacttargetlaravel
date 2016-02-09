@@ -1,4 +1,4 @@
-{
+  {
     "name": "digitaladditive/exacttarget-laravel",
     "description": "The best way to talk to Exact Target with Hypertext PreProcessor",
     "license": "MIT",
@@ -25,7 +25,7 @@
     },
     "scripts": {
     "post-install-cmd": [
-      "digitaladditive\\exacttargetlaravel\\PostInstall::initConfig"
+      "digitaladditive\\exacttargetlaravel\\PostInstall::sayHello"
     ]
   }
 }
