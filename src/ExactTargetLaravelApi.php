@@ -1,22 +1,22 @@
 <?php
 
-namespace digitaladditive\exacttargetlaravel;
+namespace digitaladditive\ExactTargetLaravel;
 
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
+use FuelSdkPhp\ET_DataExtension_Column;
+use FuelSdkPhp\ET_DataExtension_Row;
+use FuelSdkPhp\ET_DataExtension;
 use GuzzleHttp\Psr7\Request;
-use ET_DataExtension_Column;
-use ET_DataExtension_Row;
+use FuelSdkPhp\ET_Client;
 use GuzzleHttp\Client;
-use ET_DataExtension;
-use ET_Client;
 
 /**
  * Class EtApi
  * @package App
  */
-class LaravelEtApi implements EtInterface {
+class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
     /**
      * client id
@@ -139,10 +139,10 @@ class LaravelEtApi implements EtInterface {
      * @param Client $client
      * @return array
      */
-    public function upsertRowset($values, $deKey)
+    public function upsertRowset($values, $dataExtensionKey)
     {
 
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rowset';
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$dataExtensionKey.'/rowset';
 
         $serialized = [];
 

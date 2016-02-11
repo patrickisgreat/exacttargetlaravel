@@ -1,14 +1,15 @@
-# API for Exact Target for use in Laravel and Other PHP MVC frameworks
+# A Simple API for connecting a Laravel app to Exact Target
 
 [![Build Status](https://travis-ci.org/JeffreyWay/Laravel-4-Generators.png?branch=master)](https://travis-ci.org/digitaladditive/exacttargetlaravel)
 
-This Laravel package provides a series of methods for clean and easy interaction with the burdgeoning Exact Target REST API as well as methods for use with Fuel SDK
+This Laravel package provides a collection of methods for clean and easy interaction with the all new
+Exact Target REST API as well as methods for use with Fuel SDK.
 
 It implements the following Contract which explains what is currently available for use in your Controllers or models.
-You can get a good idea of what each one will do just from the comments. 
-This is a work in progress and there are many more endpoints to make methods for. 
+You can get a good idea of what each one will do just from the comments.
+This is a work in progress and there are many more endpoints to make methods for.
 
-This build includes one implementation for Laravel. 
+This build includes one implementation for Laravel.
 
 ```php
 <?php
@@ -148,24 +149,31 @@ This build includes one implementation for Laravel.
 
 Begin by installing this package through Composer. Edit your project's `composer.json` file to require `digitaladditive/exacttargetlaravel`. Or just run composer require digitaladditive/exacttargetlaravel
 
-
 	"require-dev": {
-		"digitaladditive/exacttargetlaravel": "~0.1"
+		"digitaladditive/ExactTargetLaravel": "~1.1"
 	}
-
-
 
 Next, update Composer from the Terminal:
 
     composer update --dev
 
+Next, You will have to fill out your Exact Target CLIENT_ID and CLIENT_SECRET within the config.php file included with this package in this package's root directory. You MUST also fill out the same variables and rename the file `config.php.template` that gets installed along with this package's dependancy -- Fuel SDK -- in your PROJECT's vendor folder under `vendor/exacttarget/fuel-sdk-php/config.php.template`.
+Also included with this package is a directory called `wsdl` which includes a file called `ExactTargetWSDL.xml`. Copy this directory and it's contents into `vendor/exacttarget/fuel-sdk-php/`, and update the config file's `xmlloc` variable to the following value: `'xmlloc' => __DIR__.'/wsdl/ExactTargetWSDL.xml'`.
 
-Next, You will have to fill out your CLIENT_ID and CLIENT_SECRET into the config.php file included with this package in this package's root directory. You MUST also fill out the same variables and rename the file `config.php.template` that gets installed along with this package's dependancy -- Fuel SDK -- in your PROJECT's vendor folder under `vendor/exacttarget/fuel-sdk-php/config.php.template`.
-	Also included with this package is a directory called `wsdl` which includes a file called `ExactTargetWSDL.xml`. Copy this directory and it's contents into `vendor/exacttarget/fuel-sdk-php/`, and update the config file's `xmlloc` variable to the following value: `'xmlloc' => __DIR__.'/wsdl/ExactTargetWSDL.xml'`.
+I know this is a bit of a pain in terms of configuration. As soon as the Exact Target REST api gets more flushed out with more Data Event endpoints I will deprecate the SOAP methods and use of the Fuel SDK. At that time most of the above configuration will not be necessary.
 
-I know this is a bit of a pain in terms of configuration. As soon as the Exact Target REST api gets more flushed out with more Data Event endpoints I will deprecate the SOAP methods and use of the Fuel SDK. At that time most of the above configuration will not be necessary. 
+For automated deployments you can keep a copy of these configuration files anywhere in your repository and have your task runner copy them into place. We use Gulp / Elixir at Digital Additve and our Gulp config for
+This looks like this:
 
-Now just write a use statement at the top of your Laravel project like so:
+	elixir(function (mix) {
+		    mix.copy('config/etApi_config.php', 'vendor/digitaladditive/exacttarget-laravel/config.php');
+
+            mix.copy('config/etFuel_config.php', 'vendor/exacttarget/fuel-sdk-php/config.php');
+
+            mix.copy('vendor/digitaladditive/exacttarget-laravel/wsdl', 'vendor/exacttarget/fuel-sdk-php/wsdl');
+	});
+
+Now just write a use statement at the top of your Laravel app files like so:
 
 	use digitaladditive\exacttargetlaravel\LaravelEtApi;
 
@@ -189,7 +197,7 @@ A few usage examples
 	/* Delete a Row from a DE */
 	return $this->etConnect()->deleteRow('TestingRest', ['primaryKey' => 1]);
 
-	/* example of building a batch of rows from Laravel Models */ 
+	/* example of building a batch of rows from Laravel Models */
 	public function upsertRowsetExample()
 	    {
 	        //master array for one loop
