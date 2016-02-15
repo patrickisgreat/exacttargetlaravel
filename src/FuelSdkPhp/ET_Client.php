@@ -2,10 +2,10 @@
 
 namespace FuelSdkPhp;
 
-require('soap-wsse.php');
-require('JWT.php');
+require(__DIR__ .'/soap-wsse.php');
+require(__DIR__ .'/JWT.php');
 
-class ET_Client extends SoapClient
+class ET_Client extends \SoapClient
 {
 
     public $packageName, $packageFolders, $parentFolders;
@@ -20,8 +20,8 @@ class ET_Client extends SoapClient
 
         $this->xmlLoc = __DIR__ . '/ExactTargetWSDL.xml';
 
-        if (file_exists(realpath(__DIR__ . "../../config.php"))) {
-            $config = include 'config.php';
+        if (file_exists(realpath(__DIR__ . "/../../ExactTargetLaravelConfig.php"))) {
+            $config = include __DIR__ . "/../../ExactTargetLaravelConfig.php";
         }
 
         if ($config) {
@@ -57,7 +57,7 @@ class ET_Client extends SoapClient
         if (!property_exists($this, 'clientId') || is_null($this->clientId) || !property_exists($this,
                 'clientSecret') || is_null($this->clientSecret)
         ) {
-            throw new Exception('clientid or clientsecret is null: Must be provided in config file or passed when instantiating ET_Client');
+            throw new \Exception('clientid or clientsecret is null: Must be provided in config file or passed when instantiating ET_Client');
         }
 
         if ($getWSDL) {
@@ -66,11 +66,11 @@ class ET_Client extends SoapClient
 
         if ($params && array_key_exists('jwt', $params)) {
             if (!property_exists($this, 'appsignature') || is_null($this->appsignature)) {
-                throw new Exception('Unable to utilize JWT for SSO without appsignature: Must be provided in config file or passed when instantiating ET_Client');
+                throw new \Exception('Unable to utilize JWT for SSO without appsignature: Must be provided in config file or passed when instantiating ET_Client');
             }
             $decodedJWT = JWT::decode($params['jwt'], $this->appsignature);
-            $dv = new DateInterval('PT' . $decodedJWT->request->user->expiresIn . 'S');
-            $newexpTime = new DateTime();
+            $dv = new \DateInterval('PT' . $decodedJWT->request->user->expiresIn . 'S');
+            $newexpTime = new \DateTime();
             $this->setAuthToken($this->tenantKey, $decodedJWT->request->user->oauthToken, $newexpTime->add($dv));
             $this->setInternalAuthToken($this->tenantKey, $decodedJWT->request->user->internalOauthToken);
             $this->setRefreshToken($this->tenantKey, $decodedJWT->request->user->refreshToken);
@@ -85,10 +85,10 @@ class ET_Client extends SoapClient
             if ($endpointObject && property_exists($endpointObject, "url")) {
                 $this->endpoint = $endpointObject->url;
             } else {
-                throw new Exception('Unable to determine stack using /platform/v1/endpoints/:' . $endpointResponse->body);
+                throw new \Exception('Unable to determine stack using /platform/v1/endpoints/:' . $endpointResponse->body);
             }
         } catch (Exception $e) {
-            throw new Exception('Unable to determine stack using /platform/v1/endpoints/: ' . $e->getMessage());
+            throw new \Exception('Unable to determine stack using /platform/v1/endpoints/: ' . $e->getMessage());
         }
         parent::__construct($this->xmlLoc, array('trace' => 1, 'exceptions' => 0, 'connection_timeout' => 120));
         parent::__setLocation($this->endpoint);
@@ -100,7 +100,7 @@ class ET_Client extends SoapClient
             parent::__construct($this->xmlLoc, array('trace' => 1, 'exceptions' => 0));
         }
         try {
-            $currentTime = new DateTime();
+            $currentTime = new \DateTime();
             if (is_null($this->getAuthTokenExpiration($this->tenantKey))) {
                 $timeDiff = 0;
             } else {
@@ -112,7 +112,7 @@ class ET_Client extends SoapClient
                 $url = $this->tenantKey == null
                     ? "https://auth.exacttargetapis.com/v1/requestToken?legacy=1"
                     : "https://www.exacttargetapis.com/provisioning/v1/tenants/{$this->tenantKey}/requestToken?legacy=1";
-                $jsonRequest = new stdClass();
+                $jsonRequest = new \stdClass();
                 $jsonRequest->clientId = $this->clientId;
                 $jsonRequest->clientSecret = $this->clientSecret;
                 $jsonRequest->accessType = "offline";
@@ -124,19 +124,19 @@ class ET_Client extends SoapClient
 
                 if ($authResponse && property_exists($authObject, "accessToken")) {
 
-                    $dv = new DateInterval('PT' . $authObject->expiresIn . 'S');
-                    $newexpTime = new DateTime();
+                    $dv = new \DateInterval('PT' . $authObject->expiresIn . 'S');
+                    $newexpTime = new \DateTime();
                     $this->setAuthToken($this->tenantKey, $authObject->accessToken, $newexpTime->add($dv));
                     $this->setInternalAuthToken($this->tenantKey, $authObject->legacyToken);
                     if (property_exists($authObject, 'refreshToken')) {
                         $this->setRefreshToken($this->tenantKey, $authObject->refreshToken);
                     }
                 } else {
-                    throw new Exception('Unable to validate App Keys(ClientID/ClientSecret) provided, requestToken response:' . $authResponse->body);
+                    throw new \Exception('Unable to validate App Keys(ClientID/ClientSecret) provided, requestToken response:' . $authResponse->body);
                 }
             }
         } catch (Exception $e) {
-            throw new Exception('Unable to validate App Keys(ClientID/ClientSecret) provided.: ' . $e->getMessage());
+            throw new \Exception('Unable to validate App Keys(ClientID/ClientSecret) provided.: ' . $e->getMessage());
         }
     }
 
@@ -166,7 +166,7 @@ class ET_Client extends SoapClient
                 file_put_contents($this->xmlLoc, $newWSDL);
             }
         } catch (Exception $e) {
-            throw new Exception('Unable to store local copy of WSDL file' . "\n");
+            throw new \Exception('Unable to store local copy of WSDL file' . "\n");
         }
     }
 
@@ -180,7 +180,7 @@ class ET_Client extends SoapClient
         $result = curl_exec($curl);
 
         if ($result === false) {
-            throw new Exception(curl_error($curl));
+            throw new \Exception(curl_error($curl));
         }
 
         return curl_getinfo($curl, CURLINFO_FILETIME);
@@ -403,10 +403,10 @@ class ET_Client extends SoapClient
 
                 return $sendresult;
             } else {
-                throw new Exception("Unable to send using send definition due to: " . print_r($result, true));
+                throw new \Exception("Unable to send using send definition due to: " . print_r($result, true));
             }
         } else {
-            throw new Exception("Unable to create send definition due to: " . print_r($result, true));
+            throw new \Exception("Unable to create send definition due to: " . print_r($result, true));
         }
     }
 
@@ -429,10 +429,10 @@ class ET_Client extends SoapClient
 
                 return $sendresult;
             } else {
-                throw new Exception("Unable to send using send definition due to:" . print_r($result, true));
+                throw new \Exception("Unable to send using send definition due to:" . print_r($result, true));
             }
         } else {
-            throw new Exception("Unable to create send definition due to: " . print_r($result, true));
+            throw new \Exception("Unable to create send definition due to: " . print_r($result, true));
         }
     }
 
@@ -455,7 +455,7 @@ class ET_Client extends SoapClient
         if ($result->status) {
             return $import->start();
         } else {
-            throw new Exception("Unable to create import definition due to: " . print_r($result, true));
+            throw new \Exception("Unable to create import definition due to: " . print_r($result, true));
         }
     }
 
@@ -483,7 +483,7 @@ class ET_Client extends SoapClient
         if ($result->status) {
             return $import->start();
         } else {
-            throw new Exception("Unable to create import definition due to: " . print_r($result, true));
+            throw new \Exception("Unable to create import definition due to: " . print_r($result, true));
         }
     }
 
@@ -612,17 +612,17 @@ class ET_Get extends ET_Constructor
         }
         if ($filter) {
             if (array_key_exists("LogicalOperator", $filter)) {
-                $cfp = new stdClass();
-                $cfp->LeftOperand = new SoapVar($filter["LeftOperand"], SOAP_ENC_OBJECT, 'SimpleFilterPart',
+                $cfp = new \stdClass();
+                $cfp->LeftOperand = new \SoapVar($filter["LeftOperand"], SOAP_ENC_OBJECT, 'SimpleFilterPart',
                     "http://exacttarget.com/wsdl/partnerAPI");
-                $cfp->RightOperand = new SoapVar($filter["RightOperand"], SOAP_ENC_OBJECT, 'SimpleFilterPart',
+                $cfp->RightOperand = new \SoapVar($filter["RightOperand"], SOAP_ENC_OBJECT, 'SimpleFilterPart',
                     "http://exacttarget.com/wsdl/partnerAPI");
                 $cfp->LogicalOperator = $filter["LogicalOperator"];
-                $retrieveRequest["Filter"] = new SoapVar($cfp, SOAP_ENC_OBJECT, 'ComplexFilterPart',
+                $retrieveRequest["Filter"] = new \SoapVar($cfp, SOAP_ENC_OBJECT, 'ComplexFilterPart',
                     "http://exacttarget.com/wsdl/partnerAPI");
 
             } else {
-                $retrieveRequest["Filter"] = new SoapVar($filter, SOAP_ENC_OBJECT, 'SimpleFilterPart',
+                $retrieveRequest["Filter"] = new \SoapVar($filter, SOAP_ENC_OBJECT, 'SimpleFilterPart',
                     "http://exacttarget.com/wsdl/partnerAPI");
             }
         }
@@ -755,12 +755,12 @@ class ET_Post extends ET_Constructor
         $objects = array();
 
         if (isAssoc($props)) {
-            $objects["Objects"] = new SoapVar($props, SOAP_ENC_OBJECT, $objType,
+            $objects["Objects"] = new \SoapVar($props, SOAP_ENC_OBJECT, $objType,
                 "http://exacttarget.com/wsdl/partnerAPI");
         } else {
             $objects["Objects"] = array();
             foreach ($props as $object) {
-                $objects["Objects"][] = new SoapVar($object, SOAP_ENC_OBJECT, $objType,
+                $objects["Objects"][] = new \SoapVar($object, SOAP_ENC_OBJECT, $objType,
                     "http://exacttarget.com/wsdl/partnerAPI");
             }
         }
@@ -811,7 +811,7 @@ class ET_Patch extends ET_Constructor
         $objects = array();
         $object = $props;
 
-        $objects["Objects"] = new SoapVar($props, SOAP_ENC_OBJECT, $objType, "http://exacttarget.com/wsdl/partnerAPI");
+        $objects["Objects"] = new \SoapVar($props, SOAP_ENC_OBJECT, $objType, "http://exacttarget.com/wsdl/partnerAPI");
         if ($upsert) {
             $objects["Options"] = array(
                 'SaveOptions' => array(
@@ -858,7 +858,7 @@ class ET_Delete extends ET_Constructor
         $objects = array();
         $object = $props;
 
-        $objects["Objects"] = new SoapVar($props, SOAP_ENC_OBJECT, $objType, "http://exacttarget.com/wsdl/partnerAPI");
+        $objects["Objects"] = new \SoapVar($props, SOAP_ENC_OBJECT, $objType, "http://exacttarget.com/wsdl/partnerAPI");
         $objects["Options"] = "";
         $cr["DeleteRequest"] = $objects;
 
@@ -896,11 +896,11 @@ class ET_Configure extends ET_Constructor
 
         if (!isAssoc($props)) {
             foreach ($props as $value) {
-                $configureRequest['Configurations'][] = new SoapVar($value, SOAP_ENC_OBJECT, $objType,
+                $configureRequest['Configurations'][] = new \SoapVar($value, SOAP_ENC_OBJECT, $objType,
                     "http://exacttarget.com/wsdl/partnerAPI");
             }
         } else {
-            $configureRequest['Configurations'][] = new SoapVar($props, SOAP_ENC_OBJECT, $objType,
+            $configureRequest['Configurations'][] = new \SoapVar($props, SOAP_ENC_OBJECT, $objType,
                 "http://exacttarget.com/wsdl/partnerAPI");
         }
 
@@ -935,7 +935,7 @@ class ET_Perform extends ET_Constructor
         $performRequest = array();
         $performRequest['Action'] = $action;
         $performRequest['Definitions'] = array();
-        $performRequest['Definitions'][] = new SoapVar($props, SOAP_ENC_OBJECT, $objType,
+        $performRequest['Definitions'][] = new \SoapVar($props, SOAP_ENC_OBJECT, $objType,
             "http://exacttarget.com/wsdl/partnerAPI");
 
         $perform['PerformRequestMsg'] = $performRequest;
@@ -980,7 +980,7 @@ class ET_GetSupportRest extends ET_BaseObjectRest
         }
         foreach ($this->urlPropsRequired as $value) {
             if (is_null($this->props) || in_array($value, $this->props)) {
-                throw new Exception("Unable to process request due to missing required prop: {$value}");
+                throw new \Exception("Unable to process request due to missing required prop: {$value}");
             }
         }
 
@@ -1065,7 +1065,7 @@ class ET_CUDSupportRest extends ET_GetSupportRest
 
         foreach ($this->urlPropsRequired as $value) {
             if (is_null($this->props) || in_array($value, $this->props)) {
-                throw new Exception("Unable to process request due to missing required prop: {$value}");
+                throw new \Exception("Unable to process request due to missing required prop: {$value}");
             }
         }
 
@@ -1091,7 +1091,7 @@ class ET_CUDSupportRest extends ET_GetSupportRest
         // All URL Props are required when doing Patch
         foreach ($this->urlProps as $value) {
             if (is_null($this->props) || !array_key_exists($value, $this->props)) {
-                throw new Exception("Unable to process request due to missing required prop: {$value}");
+                throw new \Exception("Unable to process request due to missing required prop: {$value}");
             }
         }
 
@@ -1120,7 +1120,7 @@ class ET_CUDSupportRest extends ET_GetSupportRest
         // All URL Props are required when doing Delete
         foreach ($this->urlProps as $value) {
             if (is_null($this->props) || !array_key_exists($value, $this->props)) {
-                throw new Exception("Unable to process request due to missing required prop: {$value}");
+                throw new \Exception("Unable to process request due to missing required prop: {$value}");
             }
         }
 
@@ -1320,7 +1320,7 @@ class ET_Asset extends ET_CUDSupportRest
         $outputJSON = curl_exec($ch);
         curl_close($ch);
 
-        $responseObject = new stdClass();
+        $responseObject = new \stdClass();
         $responseObject->body = $outputJSON;
         $responseObject->httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -1409,7 +1409,7 @@ class ET_CUDSupport extends ET_GetSupport
                             $this->authStub->packageFolders[$result->ContentType] = $result->ID;
                         }
                     } else {
-                        throw new Exception('Unable to retrieve folders from account due to: ' . $resultPackageFolder->message);
+                        throw new \Exception('Unable to retrieve folders from account due to: ' . $resultPackageFolder->message);
                     }
                 }
 
@@ -1430,7 +1430,7 @@ class ET_CUDSupport extends ET_GetSupport
                                 $this->authStub->parentFolders[$result->ContentType] = $result->ID;
                             }
                         } else {
-                            throw new Exception('Unable to retrieve folders from account due to: ' . $resultParentFolders->message);
+                            throw new \Exception('Unable to retrieve folders from account due to: ' . $resultParentFolders->message);
                         }
                     }
                     $newFolder = new ET_Folder();
@@ -1446,7 +1446,7 @@ class ET_CUDSupport extends ET_GetSupport
                     if ($folderResult->status) {
                         $this->authStub->packageFolders[$this->folderMediaType] = $folderResult->results[0]->NewID;
                     } else {
-                        throw new Exception('Unable to create folder for Post due to: ' . $folderResult->message);
+                        throw new \Exception('Unable to create folder for Post due to: ' . $folderResult->message);
                     }
                 }
                 $this->props[$this->folderProperty] = $this->authStub->packageFolders[$this->folderMediaType];
@@ -1674,7 +1674,7 @@ class ET_DataExtension_Row extends ET_CUDWithUpsertSupport
     {
         if (is_null($this->Name)) {
             if (is_null($this->CustomerKey)) {
-                throw new Exception('Unable to process request due to CustomerKey and Name not being defined on ET_DataExtension_Row');
+                throw new \Exception('Unable to process request due to CustomerKey and Name not being defined on ET_DataExtension_Row');
             } else {
                 $nameLookup = new ET_DataExtension();
                 $nameLookup->authStub = $this->authStub;
@@ -1688,7 +1688,7 @@ class ET_DataExtension_Row extends ET_CUDWithUpsertSupport
                 if ($nameLookupGet->status && count($nameLookupGet->results) == 1) {
                     $this->Name = $nameLookupGet->results[0]->Name;
                 } else {
-                    throw new Exception('Unable to process request due to unable to find DataExtension based on CustomerKey');
+                    throw new \Exception('Unable to process request due to unable to find DataExtension based on CustomerKey');
                 }
             }
         }
@@ -1698,7 +1698,7 @@ class ET_DataExtension_Row extends ET_CUDWithUpsertSupport
     {
         if (is_null($this->CustomerKey)) {
             if (is_null($this->Name)) {
-                throw new Exception('Unable to process request due to CustomerKey and Name not being defined on ET_DataExtension_Row');
+                throw new \Exception('Unable to process request due to CustomerKey and Name not being defined on ET_DataExtension_Row');
             } else {
                 $nameLookup = new ET_DataExtension();
                 $nameLookup->authStub = $this->authStub;
@@ -1708,7 +1708,7 @@ class ET_DataExtension_Row extends ET_CUDWithUpsertSupport
                 if ($nameLookupGet->status && count($nameLookupGet->results) == 1) {
                     $this->CustomerKey = $nameLookupGet->results[0]->CustomerKey;
                 } else {
-                    throw new Exception('Unable to process request due to unable to find DataExtension based on Name');
+                    throw new \Exception('Unable to process request due to unable to find DataExtension based on Name');
                 }
             }
         }
@@ -1831,7 +1831,7 @@ class ET_Import extends ET_CUDSupport
         # If the ID property is specified for the destination then it must be a list import
         if (array_key_exists('DestinationObject', $this->props)) {
             if (array_key_exists('ID', $this->props['DestinationObject'])) {
-                $this->props['DestinationObject'] = new SoapVar($this->props['DestinationObject'], SOAP_ENC_OBJECT,
+                $this->props['DestinationObject'] = new \SoapVar($this->props['DestinationObject'], SOAP_ENC_OBJECT,
                     'List', "http://exacttarget.com/wsdl/partnerAPI");
             }
         }
@@ -2064,7 +2064,7 @@ function restGet($url)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $outputJSON = curl_exec($ch);
-    $responseObject = new stdClass();
+    $responseObject = new \stdClass();
     $responseObject->body = $outputJSON;
     $responseObject->httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -2099,7 +2099,7 @@ function restPost($url, $content)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $outputJSON = curl_exec($ch);
-    $responseObject = new stdClass();
+    $responseObject = new \stdClass();
     $responseObject->body = $outputJSON;
     $responseObject->httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -2138,7 +2138,7 @@ function restPatch($url, $content)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $outputJSON = curl_exec($ch);
-    $responseObject = new stdClass();
+    $responseObject = new \stdClass();
     $responseObject->body = $outputJSON;
     $responseObject->httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -2176,7 +2176,7 @@ function restPut($url, $content)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $outputJSON = curl_exec($ch);
-    $responseObject = new stdClass();
+    $responseObject = new \stdClass();
     $responseObject->body = $outputJSON;
     $responseObject->httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -2207,7 +2207,7 @@ function restDelete($url)
 
     $outputJSON = curl_exec($ch);
 
-    $responseObject = new stdClass();
+    $responseObject = new \stdClass();
     $responseObject->body = $outputJSON;
     $responseObject->httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 

@@ -2,19 +2,22 @@
 
 namespace digitaladditive\ExactTargetLaravel;
 
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\RequestException;
-use Psr\Http\Message\ResponseInterface;
-use FuelSdkPhp\ET_DataExtension_Column;
-use FuelSdkPhp\ET_DataExtension_Row;
-use FuelSdkPhp\ET_DataExtension;
-use GuzzleHttp\Psr7\Request;
-use FuelSdkPhp\ET_Client;
-use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException as BadResponseException;
+use GuzzleHttp\Exception\RequestException as RequestException;
+use Psr\Http\Message\ResponseInterface as ResponseInterface;
+use FuelSdkPhp\ET_DataExtension_Column as ET_DataExtension_Column;
+use FuelSdkPhp\ET_DataExtension_Row as ET_DataExtension_Row;
+use FuelSdkPhp\ET_DataExtension as ET_DataExtension;
+use GuzzleHttp\Psr7\Request as Request;
+use FuelSdkPhp\ET_Client as ET_Client;
+use GuzzleHttp\Client as Client;
 
 /**
- * Class EtApi
+ *
+ * Class ExactTargetLaravelApi
+ *
  * @package App
+ *
  */
 class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
@@ -63,15 +66,14 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      * @param ET_DataExtension_Row $fuelDe
      * @param ET_DataExtension_Column $fuelDeColumn
      */
-    function __construct(Client $client, ET_Client $fuel, ET_DataExtension_Row $fuelDe, ET_DataExtension_Column $fuelDeColumn, ET_DataExtension $fuelDext)
+    function __construct()
     {
-
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
-        $this->client = $client;
-        $this->fuelDeColumn = $fuelDeColumn;
-        $this->fuel = $fuel;
-        $this->fuelDe = $fuelDe;
-        $this->fuelDext = $fuelDext;
+        $this->client = new Client();
+        $this->fuel = new ET_Client();
+        $this->fuelDe = new ET_DataExtension_Row();
+        $this->fuelDeColumn = new ET_DataExtension_Column();
+        $this->fuelDext = new ET_DataExtension();
         $this->config = $this->getConfig();
         $this->clientId = $this->config['clientid'];
         $this->clientSecret = $this->config['clientsecret'];
@@ -81,10 +83,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
     public function getConfig()
     {
-        if (file_exists(__DIR__ .'/../config.php'))
+        if (file_exists(__DIR__ .'/../ExactTargetLaravelConfig.php'))
         {
-            $config = include __DIR__ .'/../config.php';
-
+            $config = include __DIR__ .'/../ExactTargetLaravelConfig.php';
         }
         return $config;
     }
@@ -269,34 +270,35 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             $this->fuelDe->props[] = $v->Name;
         }
 
-        //if the function is calle with these values -- filter by them
+        //if the function is called with these values -- filter by them
         if ($primaryKey !== '' && $keyName !== '')
         {
-            $this->fuelDe->filter = array('Property' => $keyName,'SimpleOperator' => 'equals','Value' => $primaryKey);
+            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals','Value' => $primaryKey);
         }
 
         //get rows from the columns
-        $getRes = $this->fuelDe->get();
+        $results = $this->fuelDe->get();
 
-        if ($getRes->status == true)
+        if ($results->status == false)
         {
-            dd($getRes->OverallStatus);
-            return $getRes;
+            return print 'Exception Message: '.$getRes->message."\n";
         }
 
-        return print 'Message: '.$getRes->message."\n";
+        if (!$results->moreResults)
+        {
+            return $getRes;
+        }
+        else {
+            $moreResults = [];
+        }
 
-        /*while ($results->OverallStatus=="MoreDataAvailable") {
-            $rr = new ExactTarget_RetrieveRequest();
-            $rr->ContinueRequest = $results->RequestID;
-            $rrm = new ExactTarget_RetrieveRequestMsg();
-            $rrm->RetrieveRequest = $rr;
-            $results = null;
-            $results = $client->Retrieve($rrm);
-            $tempRequestID = $results->RequestID;
-            print_r($results->OverallStatus.' : '.$results->RequestID.' : '.count($results->Results));
-            print_r('<br>');
-        }*/
+
+        while ($results->moreResults)
+        {   
+            $moreResults[] = $fuelDe->GetMoreResults();
+        }
+
+        return $moreResults;
     }
 
     /**

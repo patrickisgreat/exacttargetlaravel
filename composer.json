@@ -29,14 +29,21 @@
         "guzzlehttp/guzzle": "~5.0",
         "psr/http-message": "1.0",
         "guzzlehttp/psr7": "1.0.0",
-        "exacttarget/fuel-sdk-php": "^0.9.0"
+        "laravel/homestead": "^3.0"
     },
     "autoload": {
+        "classmap": [
+            "src/",
+            "vendor/guzzle"
+        ],
         "psr-4": {
             "digitaladditive\\ExactTargetLaravel\\": "src"
         }
     },
     "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ],
         "psr-4": {
             "digitaladditive\\ExactTargetLaravel\\Test\\": "tests"
         }

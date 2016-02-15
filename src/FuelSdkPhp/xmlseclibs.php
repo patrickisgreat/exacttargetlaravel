@@ -1,6 +1,6 @@
 <?php
 
-namespace digitaladditive\ExactTargetLaravel\FuelSdkPhp;
+namespace FuelSdkPhp;
 
 /*
 Functions to generate simple cases of Exclusive Canonical XML - Callable function is C14NGeneral() 

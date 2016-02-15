@@ -1,0 +1,1 @@
+{"virtualbox":{"/home/vagrant/etapi-bitbucket":{"type":null,"mount_options":[],"guestpath":"/home/vagrant/etapi-bitbucket","hostpath":"/Library/WebServer/Documents/EtApi_bitbucket","disabled":false},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Library/WebServer/Documents/EtApi_bitbucket","disabled":false}}}

@@ -1,0 +1,10 @@
+TAP version 13
+ok 1 - digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testGetConfig
+not ok 2 - Error: digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testGetToken
+ok 3 - digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testRestConnection
+ok 4 - digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testSoapConnection
+ok 5 - digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testUpsertRowset
+ok 6 - digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testDeleteRow
+ok 7 - digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testGetDeColumns
+ok 8 - digitaladditive\ExactTargetLaravel\Test\ExactTargetLaravelTests::testGetRows
+1..8
