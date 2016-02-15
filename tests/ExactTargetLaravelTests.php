@@ -23,7 +23,7 @@ class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
         $config = $this->api->getConfig();
         $this->assertTrue(!is_null($config['clientid']), "Please fill out the configuration files");
     }
-    
+
 
     /**
      * Test that we can upsert a Rowset
