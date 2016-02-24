@@ -3,10 +3,10 @@
 namespace digitaladditive\ExactTargetLaravel;
 
 use GuzzleHttp\Exception\BadResponseException as BadResponseException;
-use GuzzleHttp\Exception\RequestException as RequestException;
-use Psr\Http\Message\ResponseInterface as ResponseInterface;
 use FuelSdkPhp\ET_DataExtension_Column as ET_DataExtension_Column;
+use GuzzleHttp\Exception\RequestException as RequestException;
 use FuelSdkPhp\ET_DataExtension_Row as ET_DataExtension_Row;
+use Psr\Http\Message\ResponseInterface as ResponseInterface;
 use FuelSdkPhp\ET_DataExtension as ET_DataExtension;
 use GuzzleHttp\Psr7\Request as Request;
 use FuelSdkPhp\ET_Client as ET_Client;
@@ -20,6 +20,8 @@ use GuzzleHttp\Client as Client;
  *
  */
 class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
+
+    use SerializeDataTrait;
 
     /**
      * client id
@@ -59,12 +61,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
 
     /**
-     * Construction Work
-     *
-     * @param Client $client
-     * @param ET_Client $fuel
-     * @param ET_DataExtension_Row $fuelDe
-     * @param ET_DataExtension_Column $fuelDeColumn
+     * ExactTargetLaravelApi constructor.
      */
     function __construct()
     {
@@ -140,24 +137,17 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      * @param Client $client
      * @return array
      */
-    public function upsertRowset($values, $dataExtensionKey)
+    public function upsertRowset($data, $dataExtensionKey)
     {
 
         $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$dataExtensionKey.'/rowset';
 
-        $serialized = [];
-
-        foreach ($values as $k => $v)
+        if (is_array($data))
         {
-            $serialized[] =
-                [
-                    "keys" => $v['keys'],
-                    "values" => $v['values']
-                ];
+            $data = $this->it_serializes_data($data);
         }
-        $serialized = json_encode($serialized);
 
-        $request['body'] = $serialized;
+        $request['body'] = $data;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -168,7 +158,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         try {
             //post upsert
             $response = $this->client->post($upsertUri, $request);
-            $responseBody = json_decode($response->getBody());
+            $responseBody = json_decode($response->getStatusCode());
 
         } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
@@ -205,10 +195,10 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         if ($getRes->status == true)
         {
-            return $getRes->message;
+            return $getRes->code;
         }
 
-        return print 'Message: '.$getRes->message."\n";
+        return print 'Message: '.$getRes->code."\n";
     }
 
 
@@ -286,7 +276,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         if (!$results->moreResults)
         {
-            return $getRes;
+            return $results;
         }
         else {
             $moreResults = [];
@@ -311,15 +301,16 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      * /dataeventsasync/key:{key}/rowset
      *
      */
-    public function asyncUpsertRowset($keys, $values, $deKey)
+    public function asyncUpsertRowset($data, $deKey)
     {
         $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rowset';
 
-        //api implementation style
-        $request['body'] = json_encode([[
-            "keys" => $keys,
-            "values" => $values
-        ]]);
+        if (is_array($data))
+        {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -334,14 +325,15 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             //chain logic to the response (can fire from other classes or set booleans)
                 function(ResponseInterface $res)
                 {
-                    echo $res->getStatusCode() . "\n";
+                    $response = $res->getStatusCode() . "\n";
                 },
                 function(RequestException $e)
                 {
-                    echo $e->getMessage() . "\n";
-                    echo $e->getRequest()->getMethod();
+                    $response = $e->getMessage() . "\n";
+                    $responseMethod = $e->getRequest()->getMethod();
                 }
             );
+            $promise->wait();
         }
         catch (BadResponseException $exception)
         {
@@ -350,8 +342,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             echo $exc;
 
         }
-
-        return compact('promise');
     }
 
 
@@ -362,9 +352,15 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      *
      * /dataevents/key:{key}/rows/{primaryKeys}
      */
-    public function upsertRow($pKey, $pVal, $values, $deKey)
+    public function upsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
     {
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$pKey.':'.$pVal;
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
+
+        if (is_array($data)) {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -372,15 +368,11 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
         ];
 
-        //api implementation style
-        $request['body'] = json_encode([
-            "values" => $values
-        ]);
-
         try {
             //post upsert
             $response = $this->client->put($upsertUri, $request);
             $responseBody = json_decode($response->getBody());
+            $responseCode = json_decode($response->getStatusCode());
 
         }
         catch (BadResponseException $exception)
@@ -389,7 +381,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             $exc = $exception->getResponse()->getBody(true);
             echo "Oh No! Something went wrong! ".$exc;
         }
-        return compact('responseBody');
+        return compact('responseCode');
     }
 
 
@@ -403,9 +395,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      *
      * /dataeventsasync/key:{key}/rows/{primaryKeys}
      */
-    public function asyncUpsertRow($pKey, $pVal, $values, $deKey)
+    public function asyncUpsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
     {
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rows/'.$pKey.':'.$pVal;
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -414,9 +406,11 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         ];
 
         //api implementation style
-        $request['body'] = json_encode([
-            "values" => $values
-        ]);
+        if (is_array($data)) {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
 
         try {
             //post upsert
@@ -433,6 +427,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
                     echo $e->getRequest()->getMethod();
                 }
             );
+            $promise->wait();
         }
         catch (BadResponseException $exception)
         {
@@ -464,10 +459,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         if ($getRes->status == true)
         {
-            return compact('getRes');
+            return $getRes->code;
         }
-
-        return print 'Message: '.$getRes->message."\n";
+        return $getRes->message;
     }
 
 
@@ -497,7 +491,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         $responseBody = json_decode($response->getBody());
 
-        return compact('responseBody');
+        $responseCode = json_decode($response->getStatusCode());
+
+        return compact('responseCode', 'responseBody');
     }
 
 
@@ -529,17 +525,30 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             {
                 $getRes = $this->fuelDext->post();
 
-                print 'The Following DE was created: '. $k. "\n";
+                return $getRes->code;
             }
             catch (Exception $e)
             {
-                echo "Oh No! Something went wrong! ".$exc;
-
-                print 'Message: '.$getRes->message."\n";
+                return 'Message: '.$getRes->message."\n";
             }
         }
-
         return compact('getRes');
+    }
+
+    public function deleteDe($props)
+    {
+        $this->fuelDext->authStub = $this->fuel;
+
+        $this->fuelDext->props = $props;
+
+        try {
+            $getRes = $this->fuelDext->delete();
+            return $getRes->code;
+        }
+        catch (Exception $e) {
+            return 'Message: '.$getRes->message."\n";
+        }
+
     }
 
 }

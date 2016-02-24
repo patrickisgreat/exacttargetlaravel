@@ -188,7 +188,7 @@ class ET_Client extends \SoapClient
 
     function __doRequest($request, $location, $saction, $version, $one_way = 0)
     {
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->loadXML($request);
 
         $objWSSE = new WSSESoap($doc);

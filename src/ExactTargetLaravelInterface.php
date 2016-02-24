@@ -82,7 +82,7 @@ interface ExactTargetLaravelInterface {
      * /dataeventsasync/key:{key}/rowset
      *
      */
-    public function asyncUpsertRowset($keys, $values, $deKey);
+    public function asyncUpsertRowset($values, $deKey);
 
     /**
      * PUT

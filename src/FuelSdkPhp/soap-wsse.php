@@ -98,7 +98,7 @@ class WSSESoap {
 		$this->envelope = $doc->documentElement;
 		$this->soapNS = $this->envelope->namespaceURI;
 		$this->soapPFX = $this->envelope->prefix;
-		$this->SOAPXPath = new DOMXPath($doc);
+		$this->SOAPXPath = new \DOMXPath($doc);
 		$this->SOAPXPath->registerNamespace('wssoap', $this->soapNS);
 		$this->SOAPXPath->registerNamespace('wswsse', WSSESoap::WSSENS);
 		$this->locateSecurityHeader($bMustUnderstand, $setActor);
@@ -138,7 +138,7 @@ class WSSESoap {
 
 	public function addUserToken($userName, $password=NULL, $passwordDigest=FALSE) {
 		if ($passwordDigest && empty($password)) {
-			throw new Exception("Cannot calculate the digest without a password");
+			throw new \Exception("Cannot calculate the digest without a password");
 		}
 		
 		$security = $this->locateSecurityHeader();
@@ -189,7 +189,7 @@ class WSSESoap {
 	
 	public function attachTokentoSig($token) {
 		if (! ($token instanceof DOMElement)) {
-			throw new Exception('Invalid parameter: BinarySecurityToken element expected');
+			throw new \Exception('Invalid parameter: BinarySecurityToken element expected');
 		}
 		$objXMLSecDSig = new XMLSecurityDSig();
 		if ($objDSig = $objXMLSecDSig->locateSignature($this->soapDoc)) {
@@ -209,7 +209,7 @@ class WSSESoap {
 			$reference->setAttribute("URI", $tokenURI);
 			$tokenRef->appendChild($reference);
 		} else {
-			throw new Exception('Unable to locate digital signature');
+			throw new \Exception('Unable to locate digital signature');
 		}
 	}
 
