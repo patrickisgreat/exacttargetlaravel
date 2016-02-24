@@ -1,26 +1,59 @@
 {
-    "name": "digitaladditive/exacttarget-laravel",
+    "name": "digitaladditive/ExactTargetLaravel",
+    "type": "library",
     "description": "The best way to talk to Exact Target with Hypertext PreProcessor",
     "license": "MIT",
-    "keywords": ["exacttarget-laravel"],
+    "keywords": [
+        "digitaladditive",
+        "ExactTargetLaravel",
+        "Exact Target",
+        "Laravel"
+    ],
+    "homepage": "https://github.com/:vendor/:package_name",
     "authors": [
         {
             "name": "Patrick Bennett",
-            "email": "patrick.bennett@digitaladditive.com"
+            "email": "patrick.bennett@digitaladditive.com",
+            "homepage": "http://digitaladditive.com",
+            "role": "Developer"
         }
     ],
     "require": {
-      "guzzlehttp/guzzle": "~5.0",
-      "psr/http-message": "1.0",
-      "guzzlehttp/psr7": "1.0.0",
-      "exacttarget/fuel-sdk-php": "^0.9.0"
-        },
+        "illuminate/support": "~5.1",
+        "php" : "~5.5|~7.0"
+    },
     "require-dev": {
-        "phpunit/phpunit": "4.0.*"
+        "phpunit/phpunit" : "4.*",
+        "scrutinizer/ocular": "~1.1",
+        "squizlabs/php_codesniffer": "~2.3",
+        "guzzlehttp/guzzle": "~6.0",
+        "psr/http-message": "1.0",
+        "guzzlehttp/psr7": "1.0.0",
+        "laravel/homestead": "^3.0"
     },
     "autoload": {
+        "classmap": [
+            "src/",
+            "vendor/guzzle"
+        ],
         "psr-4": {
-            "digitaladditive\\exacttargetlaravel\\": "src"
+            "digitaladditive\\ExactTargetLaravel\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ],
+        "psr-4": {
+            "digitaladditive\\ExactTargetLaravel\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
         }
     }
 }

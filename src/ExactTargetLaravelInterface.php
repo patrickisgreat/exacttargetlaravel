@@ -1,6 +1,8 @@
-<?php namespace digitaladditive\exacttargetlaravel;
+<?php
 
-interface EtInterface {
+namespace digitaladditive\ExactTargetLaravel;
+
+interface ExactTargetLaravelInterface {
 
     /**
      * reaches out to Exact Target Rest API with client secret and Id
@@ -41,7 +43,7 @@ interface EtInterface {
      * @param $props
      * @return array -- the response from Exact Target
      */
-	public function deleteRow($deName, $props);
+    public function deleteRow($deName, $props);
 
     /**
      * @param $deName
@@ -49,7 +51,7 @@ interface EtInterface {
      *
      * @return array
      */
-	public function getDeColumns($deName);
+    public function getDeColumns($deName);
 
     /**
      * SOAP WDSL
@@ -68,7 +70,7 @@ interface EtInterface {
      * @return array
      *  Response from ET
      */
-	public function getRows($deName, $keyName='', $primaryKey='');
+    public function getRows($deName, $keyName='', $primaryKey='');
 
     /**
      * POST
@@ -80,7 +82,7 @@ interface EtInterface {
      * /dataeventsasync/key:{key}/rowset
      *
      */
-	public function asyncUpsertRowset($keys, $values, $deKey);
+    public function asyncUpsertRowset($values, $deKey);
 
     /**
      * PUT
@@ -89,7 +91,7 @@ interface EtInterface {
      *
      * /dataevents/key:{key}/rows/{primaryKeys}
      */
-	public function upsertRow($pKey, $pVal, $values, $deKey);
+    public function upsertRow($pKey, $pVal, $values, $deKey);
 
     /**
      * PUT
@@ -100,7 +102,7 @@ interface EtInterface {
      *
      * /dataeventsasync/key:{key}/rows/{primaryKeys}
      */
-	public function asyncUpsertRow($pKey, $pVal, $values, $deKey);
+    public function asyncUpsertRow($pKey, $pVal, $values, $deKey);
 
     /**
      * Create a Data extension by passing an array of DE Name keys => Column props values.
@@ -108,7 +110,7 @@ interface EtInterface {
      * @param $deStructures
      * @return array (response)
      */
-	public function createRow($deName, $props);
+    public function createRow($deName, $props);
 
     /**
      * POST
@@ -119,7 +121,7 @@ interface EtInterface {
      * /validateEmail
      *
      */
-	public function validateEmail($email);
+    public function validateEmail($email);
 
     /**
      * Create a Data extension by passing an array of DE Name keys => Column props values.
@@ -127,6 +129,6 @@ interface EtInterface {
      * @param $deStructures
      * @return array (response)
      */
-	public function createDe($deStructures);
+    public function createDe($deStructures);
 
 }
