@@ -1,22 +1,27 @@
 <?php
 
-namespace digitaladditive\exacttargetlaravel;
+namespace digitaladditive\ExactTargetLaravel;
 
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\RequestException;
-use Psr\Http\Message\ResponseInterface;
-use ET_DataExtension_Column;
-use GuzzleHttp\Psr7\Request;
-use ET_DataExtension_Row;
-use GuzzleHttp\Client;
-use ET_DataExtension;
-use ET_Client;
+use GuzzleHttp\Exception\BadResponseException as BadResponseException;
+use FuelSdkPhp\ET_DataExtension_Column as ET_DataExtension_Column;
+use GuzzleHttp\Exception\RequestException as RequestException;
+use FuelSdkPhp\ET_DataExtension_Row as ET_DataExtension_Row;
+use Psr\Http\Message\ResponseInterface as ResponseInterface;
+use FuelSdkPhp\ET_DataExtension as ET_DataExtension;
+use GuzzleHttp\Psr7\Request as Request;
+use FuelSdkPhp\ET_Client as ET_Client;
+use GuzzleHttp\Client as Client;
 
 /**
- * Class EtApi
+ *
+ * Class ExactTargetLaravelApi
+ *
  * @package App
+ *
  */
-class LaravelEtApi implements EtInterface {
+class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
+
+    use SerializeDataTrait;
 
     /**
      * client id
@@ -56,22 +61,16 @@ class LaravelEtApi implements EtInterface {
 
 
     /**
-     * Construction Work
-     *
-     * @param Client $client
-     * @param ET_Client $fuel
-     * @param ET_DataExtension_Row $fuelDe
-     * @param ET_DataExtension_Column $fuelDeColumn
+     * ExactTargetLaravelApi constructor.
      */
-    function __construct(Client $client, ET_Client $fuel, ET_DataExtension_Row $fuelDe, ET_DataExtension_Column $fuelDeColumn, ET_DataExtension $fuelDext)
+    function __construct()
     {
-
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
-        $this->client = $client;
-        $this->fuelDeColumn = $fuelDeColumn;
-        $this->fuel = $fuel;
-        $this->fuelDe = $fuelDe;
-        $this->fuelDext = $fuelDext;
+        $this->client = new Client();
+        $this->fuel = new ET_Client();
+        $this->fuelDe = new ET_DataExtension_Row();
+        $this->fuelDeColumn = new ET_DataExtension_Column();
+        $this->fuelDext = new ET_DataExtension();
         $this->config = $this->getConfig();
         $this->clientId = $this->config['clientid'];
         $this->clientSecret = $this->config['clientsecret'];
@@ -81,10 +80,9 @@ class LaravelEtApi implements EtInterface {
 
     public function getConfig()
     {
-        if (file_exists(__DIR__ .'/../config.php'))
+        if (file_exists(__DIR__ .'/../ExactTargetLaravelConfig.php'))
         {
-            $config = include __DIR__ .'/../config.php';
-
+            $config = include __DIR__ .'/../ExactTargetLaravelConfig.php';
         }
         return $config;
     }
@@ -139,24 +137,17 @@ class LaravelEtApi implements EtInterface {
      * @param Client $client
      * @return array
      */
-    public function upsertRowset($values, $deKey)
+    public function upsertRowset($data, $dataExtensionKey)
     {
 
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rowset';
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$dataExtensionKey.'/rowset';
 
-        $serialized = [];
-
-        foreach ($values as $k => $v)
+        if (is_array($data))
         {
-            $serialized[] =
-                [
-                    "keys" => $v['keys'],
-                    "values" => $v['values']
-                ];
+            $data = $this->it_serializes_data($data);
         }
-        $serialized = json_encode($serialized);
 
-        $request['body'] = $serialized;
+        $request['body'] = $data;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -167,7 +158,7 @@ class LaravelEtApi implements EtInterface {
         try {
             //post upsert
             $response = $this->client->post($upsertUri, $request);
-            $responseBody = json_decode($response->getBody());
+            $responseBody = json_decode($response->getStatusCode());
 
         } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
@@ -204,10 +195,10 @@ class LaravelEtApi implements EtInterface {
 
         if ($getRes->status == true)
         {
-            return $getRes->message;
+            return $getRes->code;
         }
 
-        return print 'Message: '.$getRes->message."\n";
+        return print 'Message: '.$getRes->code."\n";
     }
 
 
@@ -269,34 +260,35 @@ class LaravelEtApi implements EtInterface {
             $this->fuelDe->props[] = $v->Name;
         }
 
-        //if the function is calle with these values -- filter by them
+        //if the function is called with these values -- filter by them
         if ($primaryKey !== '' && $keyName !== '')
         {
-            $this->fuelDe->filter = array('Property' => $keyName,'SimpleOperator' => 'equals','Value' => $primaryKey);
+            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals','Value' => $primaryKey);
         }
 
         //get rows from the columns
-        $getRes = $this->fuelDe->get();
+        $results = $this->fuelDe->get();
 
-        if ($getRes->status == true)
+        if ($results->status == false)
         {
-            dd($getRes->OverallStatus);
-            return $getRes;
+            return print 'Exception Message: '.$getRes->message."\n";
         }
 
-        return print 'Message: '.$getRes->message."\n";
+        if (!$results->moreResults)
+        {
+            return $results;
+        }
+        else {
+            $moreResults = [];
+        }
 
-        /*while ($results->OverallStatus=="MoreDataAvailable") {
-            $rr = new ExactTarget_RetrieveRequest();
-            $rr->ContinueRequest = $results->RequestID;
-            $rrm = new ExactTarget_RetrieveRequestMsg();
-            $rrm->RetrieveRequest = $rr;
-            $results = null;
-            $results = $client->Retrieve($rrm);
-            $tempRequestID = $results->RequestID;
-            print_r($results->OverallStatus.' : '.$results->RequestID.' : '.count($results->Results));
-            print_r('<br>');
-        }*/
+
+        while ($results->moreResults)
+        {   
+            $moreResults[] = $fuelDe->GetMoreResults();
+        }
+
+        return $moreResults;
     }
 
     /**
@@ -309,15 +301,16 @@ class LaravelEtApi implements EtInterface {
      * /dataeventsasync/key:{key}/rowset
      *
      */
-    public function asyncUpsertRowset($keys, $values, $deKey)
+    public function asyncUpsertRowset($data, $deKey)
     {
         $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rowset';
 
-        //api implementation style
-        $request['body'] = json_encode([[
-            "keys" => $keys,
-            "values" => $values
-        ]]);
+        if (is_array($data))
+        {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -332,14 +325,15 @@ class LaravelEtApi implements EtInterface {
             //chain logic to the response (can fire from other classes or set booleans)
                 function(ResponseInterface $res)
                 {
-                    echo $res->getStatusCode() . "\n";
+                    $response = $res->getStatusCode() . "\n";
                 },
                 function(RequestException $e)
                 {
-                    echo $e->getMessage() . "\n";
-                    echo $e->getRequest()->getMethod();
+                    $response = $e->getMessage() . "\n";
+                    $responseMethod = $e->getRequest()->getMethod();
                 }
             );
+            $promise->wait();
         }
         catch (BadResponseException $exception)
         {
@@ -348,8 +342,6 @@ class LaravelEtApi implements EtInterface {
             echo $exc;
 
         }
-
-        return compact('promise');
     }
 
 
@@ -360,9 +352,15 @@ class LaravelEtApi implements EtInterface {
      *
      * /dataevents/key:{key}/rows/{primaryKeys}
      */
-    public function upsertRow($pKey, $pVal, $values, $deKey)
+    public function upsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
     {
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$pKey.':'.$pVal;
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
+
+        if (is_array($data)) {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -370,15 +368,11 @@ class LaravelEtApi implements EtInterface {
             'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
         ];
 
-        //api implementation style
-        $request['body'] = json_encode([
-            "values" => $values
-        ]);
-
         try {
             //post upsert
             $response = $this->client->put($upsertUri, $request);
             $responseBody = json_decode($response->getBody());
+            $responseCode = json_decode($response->getStatusCode());
 
         }
         catch (BadResponseException $exception)
@@ -387,7 +381,7 @@ class LaravelEtApi implements EtInterface {
             $exc = $exception->getResponse()->getBody(true);
             echo "Oh No! Something went wrong! ".$exc;
         }
-        return compact('responseBody');
+        return compact('responseCode');
     }
 
 
@@ -401,9 +395,9 @@ class LaravelEtApi implements EtInterface {
      *
      * /dataeventsasync/key:{key}/rows/{primaryKeys}
      */
-    public function asyncUpsertRow($pKey, $pVal, $values, $deKey)
+    public function asyncUpsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
     {
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rows/'.$pKey.':'.$pVal;
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -412,9 +406,11 @@ class LaravelEtApi implements EtInterface {
         ];
 
         //api implementation style
-        $request['body'] = json_encode([
-            "values" => $values
-        ]);
+        if (is_array($data)) {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
 
         try {
             //post upsert
@@ -431,6 +427,7 @@ class LaravelEtApi implements EtInterface {
                     echo $e->getRequest()->getMethod();
                 }
             );
+            $promise->wait();
         }
         catch (BadResponseException $exception)
         {
@@ -462,10 +459,9 @@ class LaravelEtApi implements EtInterface {
 
         if ($getRes->status == true)
         {
-            return compact('getRes');
+            return $getRes->code;
         }
-
-        return print 'Message: '.$getRes->message."\n";
+        return $getRes->message;
     }
 
 
@@ -495,7 +491,9 @@ class LaravelEtApi implements EtInterface {
 
         $responseBody = json_decode($response->getBody());
 
-        return compact('responseBody');
+        $responseCode = json_decode($response->getStatusCode());
+
+        return compact('responseCode', 'responseBody');
     }
 
 
@@ -527,17 +525,30 @@ class LaravelEtApi implements EtInterface {
             {
                 $getRes = $this->fuelDext->post();
 
-                print 'The Following DE was created: '. $k. "\n";
+                return $getRes->code;
             }
             catch (Exception $e)
             {
-                echo "Oh No! Something went wrong! ".$exc;
-
-                print 'Message: '.$getRes->message."\n";
+                return 'Message: '.$getRes->message."\n";
             }
         }
-
         return compact('getRes');
+    }
+
+    public function deleteDe($props)
+    {
+        $this->fuelDext->authStub = $this->fuel;
+
+        $this->fuelDext->props = $props;
+
+        try {
+            $getRes = $this->fuelDext->delete();
+            return $getRes->code;
+        }
+        catch (Exception $e) {
+            return 'Message: '.$getRes->message."\n";
+        }
+
     }
 
 }
