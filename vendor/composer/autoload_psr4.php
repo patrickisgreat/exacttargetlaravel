@@ -6,7 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'digitaladditive\\exacttargetlaravel\\' => array($baseDir . '/src'),
+    'digitaladditive\\ExactTargetLaravel\\Test\\' => array($baseDir . '/tests'),
+    'digitaladditive\\ExactTargetLaravel\\' => array($baseDir . '/src'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),

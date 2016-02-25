@@ -32,6 +32,9 @@
     "laravel/homestead": "^3.0"
   },
   "autoload": {
+    "classmap": [
+      "src/"
+    ],
     "psr-4": {
       "digitaladditive\\ExactTargetLaravel\\": "src"
     }
@@ -39,8 +42,7 @@
   "autoload-dev": {
     "classmap": [
       "tests/",
-      "src/",
-      "vendor/guzzle"
+      "src/"
     ],
     "psr-4": {
       "digitaladditive\\ExactTargetLaravel\\Test\\": "tests"
