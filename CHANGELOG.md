@@ -1,22 +1,23 @@
 # Changelog
 
-All Notable changes to `:package_name` will be documented in this file.
+All Notable changes to `LaravelEtApi` will be documented in this file.
 
-Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
-
-## NEXT - YYYY-MM-DD
+## NEXT - 2016-02-24
 
 ### Added
-- Nothing
+Incremental more results in getRows -- to accommodate the 2500 record request limit.
+FuelSDK now bundled!! and namespaced for PSR-4 auto loading. No need for 2 configs
+Upgraded Guzzle to utilize async requests.
+Working PHPUnit test suite!
 
 ### Deprecated
 - Nothing
 
 ### Fixed
-- Nothing
+Asynchronous methods are now working properly
 
 ### Removed
-- Nothing
+
 
 ### Security
-- Nothing
+
