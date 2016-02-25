@@ -157,25 +157,13 @@ Next, update Composer from the Terminal:
 
     composer update --dev
 
-Next, You will have to fill out your Exact Target CLIENT_ID and CLIENT_SECRET within the config.php file included with this package in this package's root directory. You MUST also fill out the same variables and rename the file `config.php.template` that gets installed along with this package's dependancy -- Fuel SDK -- in your PROJECT's vendor folder under `vendor/exacttarget/fuel-sdk-php/config.php.template`.
-Also included with this package is a directory called `wsdl` which includes a file called `ExactTargetWSDL.xml`. Copy this directory and it's contents into `vendor/exacttarget/fuel-sdk-php/`, and update the config file's `xmlloc` variable to the following value: `'xmlloc' => __DIR__.'/wsdl/ExactTargetWSDL.xml'`.
+Next, You will have to fill out your Exact Target CLIENT_ID and CLIENT_SECRET within the ExactTargetLaravelConfig.php file located in the root of this package with your Exact Target API credentials.
 
-I know this is a bit of a pain in terms of configuration. As soon as the Exact Target REST api gets more flushed out with more Data Event endpoints I will deprecate the SOAP methods and use of the Fuel SDK. At that time most of the above configuration will not be necessary.
-
-For automated deployments you can keep a copy of these configuration files anywhere in your repository and have your task runner copy them into place. We use Gulp / Elixir at Digital Additve and our Gulp config for
-This looks like this:
-
-	elixir(function (mix) {
-		    mix.copy('config/etApi_config.php', 'vendor/digitaladditive/exacttarget-laravel/config.php');
-
-            mix.copy('config/etFuel_config.php', 'vendor/exacttarget/fuel-sdk-php/config.php');
-
-            mix.copy('vendor/digitaladditive/exacttarget-laravel/wsdl', 'vendor/exacttarget/fuel-sdk-php/wsdl');
-	});
+Make sure you have 'mcrypt' installed an enabled on your web server or Fuel SDK calls will fail
 
 Now just write a use statement at the top of your Laravel app files like so:
 
-	use digitaladditive\exacttargetlaravel\LaravelEtApi;
+	use digitaladditive/ExactTargetLaravel/LaravelEtApi;
 
 
 ## Usage
