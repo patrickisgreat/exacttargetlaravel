@@ -12,7 +12,7 @@ use Psr\Http\Message\UriInterface;
  */
 interface ClientInterface
 {
-    const VERSION = '6.0.2';
+    const VERSION = '6.0.1';
 
     /**
      * Send an HTTP request.
@@ -65,7 +65,7 @@ interface ClientInterface
      * @param string|UriInterface $uri     URI object or string.
      * @param array               $options Request options to apply.
      *
-     * @return PromiseInterface
+     * @return ResponseInterface
      */
     public function requestAsync($method, $uri, array $options = []);
 

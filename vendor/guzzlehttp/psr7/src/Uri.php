@@ -490,10 +490,6 @@ class Uri implements UriInterface
         }
 
         if ($path != null) {
-            // Add a leading slash if necessary.
-            if ($uri && substr($path, 0, 1) !== '/') {
-                $uri .= '/';
-            }
             $uri .= $path;
         }
 
@@ -518,7 +514,7 @@ class Uri implements UriInterface
      */
     private static function isNonStandardPort($scheme, $host, $port)
     {
-        if (!$scheme && $port) {
+        if (!$scheme) {
             return true;
         }
 
@@ -574,9 +570,13 @@ class Uri implements UriInterface
      */
     private function filterPath($path)
     {
+        if ($path != null && substr($path, 0, 1) !== '/') {
+            $path = '/' . $path;
+        }
+
         return preg_replace_callback(
-            '/(?:[^' . self::$charUnreserved . self::$charSubDelims . ':@\/%]+|%(?![A-Fa-f0-9]{2}))/',
-            [$this, 'rawurlencodeMatchZero'],
+            '/(?:[^' . self::$charUnreserved . ':@&=\+\$,\/;%]+|%(?![A-Fa-f0-9]{2}))/',
+            function ($match) { return rawurlencode($match[0]); },
             $path
         );
     }
@@ -592,13 +592,8 @@ class Uri implements UriInterface
     {
         return preg_replace_callback(
             '/(?:[^' . self::$charUnreserved . self::$charSubDelims . '%:@\/\?]+|%(?![A-Fa-f0-9]{2}))/',
-            [$this, 'rawurlencodeMatchZero'],
+            function ($match) { return rawurlencode($match[0]); },
             $str
         );
-    }
-
-    private function rawurlencodeMatchZero(array $match)
-    {
-        return rawurlencode($match[0]);
     }
 }

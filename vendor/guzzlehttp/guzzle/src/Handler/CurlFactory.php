@@ -66,14 +66,6 @@ class CurlFactory implements CurlFactoryInterface
         if (count($this->handles) >= $this->maxHandles) {
             curl_close($resource);
         } else {
-            // Remove all callback functions as they can hold onto references
-            // and are not cleaned up by curl_reset. Using curl_setopt_array
-            // does not work for some reason, so removing each one
-            // individually.
-            curl_setopt($resource, CURLOPT_HEADERFUNCTION, null);
-            curl_setopt($resource, CURLOPT_READFUNCTION, null);
-            curl_setopt($resource, CURLOPT_WRITEFUNCTION, null);
-            curl_setopt($resource, CURLOPT_PROGRESSFUNCTION, null);
             curl_reset($resource);
             $this->handles[] = $resource;
         }
@@ -117,8 +109,9 @@ class CurlFactory implements CurlFactoryInterface
     ) {
         // Get error information and release the handle to the factory.
         $ctx = [
-            'errno' => $easy->errno,
-            'error' => curl_error($easy->handle),
+            'errno'  => $easy->errno,
+            'error' => curl_error($easy->handle)
+                ?: curl_strerror($easy->errno)
         ] + curl_getinfo($easy->handle);
         $factory->release($easy);
 
@@ -180,11 +173,8 @@ class CurlFactory implements CurlFactoryInterface
             CURLOPT_RETURNTRANSFER => false,
             CURLOPT_HEADER         => false,
             CURLOPT_CONNECTTIMEOUT => 150,
+            CURLOPT_PROTOCOLS      => CURLPROTO_HTTP | CURLPROTO_HTTPS,
         ];
-
-        if (defined('CURLOPT_PROTOCOLS')) {
-            $conf[CURLOPT_PROTOCOLS] = CURLPROTO_HTTP | CURLPROTO_HTTPS;
-        }
 
         $version = $easy->request->getProtocolVersion();
         if ($version == 1.1) {

@@ -5,7 +5,6 @@ use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\Handler\Proxy;
 use GuzzleHttp\Handler\StreamHandler;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Expands a URI template
@@ -204,22 +203,4 @@ request option. See http://curl.haxx.se/docs/sslcerts.html for more
 information.
 EOT
     );
-}
-
-/**
- * Creates an associative array of lowercase header names to the actual
- * header casing.
- *
- * @param array $headers
- *
- * @return array
- */
-function normalize_header_keys(array $headers)
-{
-    $result = [];
-    foreach (array_keys($headers) as $key) {
-        $result[strtolower($key)] = $key;
-    }
-
-    return $result;
 }

@@ -9,7 +9,6 @@ use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
 /**
  * Functions used to create and wrap handlers with handler middleware.
@@ -177,18 +176,17 @@ final class Middleware
      *
      * @param LoggerInterface  $logger Logs messages.
      * @param MessageFormatter $formatter Formatter used to create message strings.
-     * @param string           $logLevel Level at which to log requests.
      *
      * @return callable Returns a function that accepts the next handler.
      */
-    public static function log(LoggerInterface $logger, MessageFormatter $formatter, $logLevel = LogLevel::INFO)
+    public static function log(LoggerInterface $logger, MessageFormatter $formatter)
     {
-        return function (callable $handler) use ($logger, $formatter, $logLevel) {
-            return function ($request, array $options) use ($handler, $logger, $formatter, $logLevel) {
+        return function (callable $handler) use ($logger, $formatter) {
+            return function ($request, array $options) use ($handler, $logger, $formatter) {
                 return $handler($request, $options)->then(
-                    function ($response) use ($logger, $request, $formatter, $logLevel) {
+                    function ($response) use ($logger, $request, $formatter) {
                         $message = $formatter->format($request, $response);
-                        $logger->log($logLevel, $message);
+                        $logger->info($message);
                         return $response;
                     },
                     function ($reason) use ($logger, $request, $formatter) {

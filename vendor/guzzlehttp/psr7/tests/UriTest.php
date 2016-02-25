@@ -53,7 +53,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('user:pass@example.com:8080', $uri->getAuthority());
         $this->assertEquals('test', $uri->getFragment());
         $this->assertEquals('example.com', $uri->getHost());
-        $this->assertEquals('path/123', $uri->getPath());
+        $this->assertEquals('/path/123', $uri->getPath());
         $this->assertEquals(8080, $uri->getPort());
         $this->assertEquals('q=abc', $uri->getQuery());
         $this->assertEquals('http', $uri->getScheme());
@@ -93,12 +93,12 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('0', (string) $url->getQuery());
         $this->assertSame('0', $url->getFragment());
         $this->assertEquals('http://a:1/0?0#0', (string) $url);
+
         $url = new Uri('');
         $this->assertSame('', (string) $url);
+
         $url = new Uri('0');
-        $this->assertSame('0', (string) $url);
-        $url = new Uri('/');
-        $this->assertSame('/', (string) $url);
+        $this->assertSame('/0', (string) $url);
     }
 
     /**
@@ -193,53 +193,5 @@ class UriTest extends \PHPUnit_Framework_TestCase
         // No host or port
         $uri = new Uri('http://foo.co');
         $this->assertEquals('foo.co', $uri->getAuthority());
-    }
-
-    public function pathTestProvider()
-    {
-        return [
-            // Percent encode spaces.
-            ['http://foo.com/baz bar', 'http://foo.com/baz%20bar'],
-            // Don't encoding something that's already encoded.
-            ['http://foo.com/baz%20bar', 'http://foo.com/baz%20bar'],
-            // Percent encode invalid percent encodings
-            ['http://foo.com/baz%2-bar', 'http://foo.com/baz%252-bar'],
-            // Don't encode path segments
-            ['http://foo.com/baz/bar/bam?a', 'http://foo.com/baz/bar/bam?a'],
-            ['http://foo.com/baz+bar', 'http://foo.com/baz+bar'],
-            ['http://foo.com/baz:bar', 'http://foo.com/baz:bar'],
-            ['http://foo.com/baz@bar', 'http://foo.com/baz@bar'],
-            ['http://foo.com/baz(bar);bam/', 'http://foo.com/baz(bar);bam/'],
-            ['http://foo.com/a-zA-Z0-9.-_~!$&\'()*+,;=:@', 'http://foo.com/a-zA-Z0-9.-_~!$&\'()*+,;=:@'],
-        ];
-    }
-
-    /**
-     * @dataProvider pathTestProvider
-     */
-    public function testUriEncodesPathProperly($input, $output)
-    {
-        $uri = new Uri($input);
-        $this->assertEquals((string) $uri, $output);
-    }
-
-    public function testDoesNotAddPortWhenNoPort()
-    {
-        $this->assertEquals('bar', new Uri('//bar'));
-        $this->assertEquals('bar', (new Uri('//bar'))->getHost());
-    }
-
-    public function testAllowsForRelativeUri()
-    {
-        $uri = (new Uri)->withPath('foo');
-        $this->assertEquals('foo', $uri->getPath());
-        $this->assertEquals('foo', (string) $uri);
-    }
-
-    public function testAddsSlashForRelativeUriStringWithHost()
-    {
-        $uri = (new Uri)->withPath('foo')->withHost('bar.com');
-        $this->assertEquals('foo', $uri->getPath());
-        $this->assertEquals('bar.com/foo', (string) $uri);
     }
 }

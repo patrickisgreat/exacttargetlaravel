@@ -9,7 +9,7 @@ require __DIR__ . '/../bootstrap.php';
 PHPUnit_TextUI_Command::main();
 ?>
 --EXPECTF--
-PHPUnit %s by Sebastian Bergmann.
+PHPUnit %s by Sebastian Bergmann and contributors.
 
 Usage: phpunit [options] UnitTest [UnitTest.php]
        phpunit [options] <directory>
@@ -46,15 +46,18 @@ Test Execution Options:
 
   --report-useless-tests    Be strict about tests that do not test anything.
   --strict-coverage         Be strict about unintentionally covered code.
+  --strict-global-state     Be strict about changes to global state
   --disallow-test-output    Be strict about output during tests.
   --enforce-time-limit      Enforce time limit based on test size.
-  --strict                  Run tests in strict mode (enables all of the above).
+  --disallow-todo-tests     Disallow @todo-annotated tests.
 
   --process-isolation       Run each test in a separate PHP process.
   --no-globals-backup       Do not backup and restore $GLOBALS for each test.
   --static-backup           Backup and restore static attributes for each test.
 
-  --colors                  Use colors in output.
+  --colors=<flag>           Use colors in output ("never", "auto" or "always").
+  --columns <n>             Number of columns to use for progress output.
+  --columns max             Use maximum number of columns for progress output.
   --stderr                  Write to STDERR instead of STDOUT.
   --stop-on-error           Stop execution upon first error.
   --stop-on-failure         Stop execution upon first error or failure.
@@ -68,13 +71,14 @@ Test Execution Options:
   --repeat <times>          Runs the test(s) repeatedly.
   --tap                     Report test execution progress in TAP format.
   --testdox                 Report test execution progress in TestDox format.
-  --printer <printer>       TestSuiteListener implementation to use.
+  --printer <printer>       TestListener implementation to use.
 
 Configuration Options:
 
   --bootstrap <file>        A "bootstrap" PHP file that is run before the tests.
   -c|--configuration <file> Read configuration from XML file.
   --no-configuration        Ignore default configuration file (phpunit.xml).
+  --no-coverage             Ignore code coverage configuration.
   --include-path <path(s)>  Prepend PHP's include_path with given path(s).
   -d key[=value]            Sets a php.ini value.
 
