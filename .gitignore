@@ -4,3 +4,4 @@ composer.lock
 Vagrantfile
 Homestead.yaml
 .vagrant
+composer.lock
