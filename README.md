@@ -1,6 +1,6 @@
 # A Simple API for connecting a Laravel app to Exact Target
 
-[![Build Status](https://semaphoreci.com/api/v1/pbisgreat/exacttargetlaravel/branches/develop/badge.svg)](https://semaphoreci.com/pbisgreat/exacttargetlaravel)
+[![Build Status](https://semaphoreci.com/api/v1/pbisgreat/exacttargetlaravel/branches/master/badge.svg)](https://semaphoreci.com/pbisgreat/exacttargetlaravel)
 This Laravel package provides a collection of methods for clean and easy interaction with the all new
 Exact Target REST API as well as methods for use with Fuel SDK.
 
