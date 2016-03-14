@@ -164,4 +164,13 @@ class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $test);
     }
 
+    public function testCreateAsset()
+    {
+        $props = ["filePath" => $_SERVER['PWD'] . '/GitHub-Mark.png'];
+
+        $test = $this->api->it_creates_a_portfolio_file($props);
+
+        $this->assertEquals(200, $test);
+    }
+
 }

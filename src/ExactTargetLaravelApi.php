@@ -4,13 +4,16 @@ namespace digitaladditive\ExactTargetLaravel;
 
 use GuzzleHttp\Exception\BadResponseException as BadResponseException;
 use FuelSdkPhp\ET_DataExtension_Column as ET_DataExtension_Column;
+use FuelSdkPhp\
 use GuzzleHttp\Exception\RequestException as RequestException;
 use FuelSdkPhp\ET_DataExtension_Row as ET_DataExtension_Row;
 use Psr\Http\Message\ResponseInterface as ResponseInterface;
 use FuelSdkPhp\ET_DataExtension as ET_DataExtension;
 use GuzzleHttp\Psr7\Request as Request;
 use FuelSdkPhp\ET_Client as ET_Client;
+use FuelSdkPhp\ET_Asset as ET_Asset;
 use GuzzleHttp\Client as Client;
+use Exception;
 
 /**
  *
@@ -71,6 +74,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         $this->fuelDe = new ET_DataExtension_Row();
         $this->fuelDeColumn = new ET_DataExtension_Column();
         $this->fuelDext = new ET_DataExtension();
+        $this->etAsset = new ET_Asset();
         $this->config = $this->getConfig();
         $this->clientId = $this->config['clientid'];
         $this->clientSecret = $this->config['clientsecret'];
@@ -546,6 +550,29 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             return $getRes->code;
         }
         catch (Exception $e) {
+            return 'Message: '.$getRes->message."\n";
+        }
+
+    }
+
+    /**
+     * Upload a File to Exact Target Portfolio
+     *
+     * @param $props array("filePath" => $_SERVER['PWD'] . '/sample-asset-TestFilePath.txt');
+     * @return array (response)
+     */
+    public function it_creates_a_portfolio_file($props)
+    {
+        $this->etAsset->authStub = $this->fuel;
+
+        $this->etAsset->props = $props;
+
+        try {
+            $getRes = $this->etAsset->Post();
+            return $getRes->code;
+        }
+        catch (Exception $e)
+        {
             return 'Message: '.$getRes->message."\n";
         }
 
