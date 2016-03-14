@@ -13,7 +13,6 @@ use GuzzleHttp\Psr7\Request as Request;
 use FuelSdkPhp\ET_Client as ET_Client;
 use FuelSdkPhp\ET_Asset as ET_Asset;
 use GuzzleHttp\Client as Client;
-use Exception;
 
 /**
  *
