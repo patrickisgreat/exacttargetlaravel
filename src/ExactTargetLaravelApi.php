@@ -4,7 +4,6 @@ namespace digitaladditive\ExactTargetLaravel;
 
 use GuzzleHttp\Exception\BadResponseException as BadResponseException;
 use FuelSdkPhp\ET_DataExtension_Column as ET_DataExtension_Column;
-use FuelSdkPhp\
 use GuzzleHttp\Exception\RequestException as RequestException;
 use FuelSdkPhp\ET_DataExtension_Row as ET_DataExtension_Row;
 use Psr\Http\Message\ResponseInterface as ResponseInterface;
