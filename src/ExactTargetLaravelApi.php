@@ -10,7 +10,11 @@ use Psr\Http\Message\ResponseInterface as ResponseInterface;
 use FuelSdkPhp\ET_DataExtension as ET_DataExtension;
 use GuzzleHttp\Psr7\Request as Request;
 use FuelSdkPhp\ET_Client as ET_Client;
+use FuelSdkPhp\ET_Asset as ET_Asset;
+use FuelSdkPhp\ET_Patch as ET_Patch;
+use FuelSdkPhp\ET_Post as ET_Post;
 use GuzzleHttp\Client as Client;
+
 
 /**
  *
@@ -71,6 +75,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         $this->fuelDe = new ET_DataExtension_Row();
         $this->fuelDeColumn = new ET_DataExtension_Column();
         $this->fuelDext = new ET_DataExtension();
+        $this->etAsset = new ET_Asset();
         $this->config = $this->getConfig();
         $this->clientId = $this->config['clientid'];
         $this->clientSecret = $this->config['clientsecret'];
@@ -551,4 +556,51 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
     }
 
+    /**
+     * Upload a File to Exact Target FTP
+     */
+    public function it_uploads_a_file_via_ftp($host, $userName, $userPass, $remoteFilePath, $localFilePath)
+    {
+        $conn_id = ftp_connect($host);
+
+        $login_result = ftp_login($conn_id, $userName, $userPass);
+
+        ftp_pasv($conn_id, true);
+
+        if (ftp_chdir($conn_id, "Import") && ftp_put($conn_id, $remoteFilePath, $localFilePath, FTP_BINARY))
+        {
+            ftp_close($conn_id);
+            return true;
+        }
+
+        echo "There was a problem while uploading $file\n";
+        ftp_close($conn_id);
+        return false;
+
+    }
+
+    /**
+     * Transfer a File from FTP to Exact Target Portfolio
+     *
+     * @param $props array("filePath" => $_SERVER['PWD'] . '/sample-asset-TestFilePath.txt');
+     * see tests for expected array structure of $props
+     * @return true
+     *
+     */
+    public function it_creates_a_portfolio_file($props)
+    {
+        $objType = 'Portfolio';
+
+        try {
+            $response = new ET_Post($this->fuel, $objType, $props);
+            if ($response->status == 1)
+            {
+                return true;
+            }
+        }
+        catch (Exception $e)
+        {
+            throw new Exception($e);
+        }
+    }
 }
