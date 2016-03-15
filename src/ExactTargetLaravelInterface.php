@@ -131,4 +131,20 @@ interface ExactTargetLaravelInterface {
      */
     public function createDe($deStructures);
 
+    /**
+     * Upload a File to Exact Target FTP
+     */
+    public function it_uploads_a_file_via_ftp($host, $userName, $userPass, $remoteFilePath, $localFilePath);
+
+    /**
+     * Upload a File to Exact Target Portfolio
+     *
+     * @param $props array("filePath" => $_SERVER['PWD'] . '/sample-asset-TestFilePath.txt');
+     * @return array (response)
+     */
+    public function it_creates_a_portfolio_file($props);
+
+
+
+
 }
