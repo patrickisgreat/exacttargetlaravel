@@ -597,6 +597,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             {
                 return true;
             }
+            return $response;
         }
         catch (Exception $e)
         {
