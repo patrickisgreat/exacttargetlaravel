@@ -576,7 +576,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         echo "There was a problem while uploading $file\n";
         ftp_close($conn_id);
         return false;
-
     }
 
     /**
