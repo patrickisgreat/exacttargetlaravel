@@ -71,7 +71,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
     {
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
         $this->client = new Client();
-        $this->fuel = new ET_Client();
         $this->fuelDe = new ET_DataExtension_Row();
         $this->fuelDeColumn = new ET_DataExtension_Column();
         $this->fuelDext = new ET_DataExtension();
@@ -85,6 +84,8 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
     public function getConfig()
     {
+        //moved this from constructor so we can override instantiating with DB credentials if desired.
+        $this->fuel = new ET_Client();
         if (file_exists(__DIR__ .'/../ExactTargetLaravelConfig.php'))
         {
             $config = include __DIR__ .'/../ExactTargetLaravelConfig.php';

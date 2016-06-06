@@ -16,13 +16,9 @@ class ET_Client extends \SoapClient
     function __construct($getWSDL = false, $debug = false, $params = null)
     {
         $tenantTokens = array();
-        $config = false;
-
+        $this->config = false;
+        $this->config = $this->getConfig();
         $this->xmlLoc = __DIR__ . '/ExactTargetWSDL.xml';
-
-        if (file_exists(realpath(__DIR__ . "/../../ExactTargetLaravelConfig.php"))) {
-            $config = include __DIR__ . "/../../ExactTargetLaravelConfig.php";
-        }
 
         if ($config) {
             $this->wsdlLoc = $config['defaultwsdl'];
@@ -92,6 +88,13 @@ class ET_Client extends \SoapClient
         }
         parent::__construct($this->xmlLoc, array('trace' => 1, 'exceptions' => 0, 'connection_timeout' => 120));
         parent::__setLocation($this->endpoint);
+    }
+
+    public function getConfig() {
+        if (file_exists(realpath(__DIR__ . "/../../ExactTargetLaravelConfig.php"))) {
+            $config = include __DIR__ . "/../../ExactTargetLaravelConfig.php";
+        }
+        return $config;
     }
 
     function refreshToken($forceRefresh = false)
