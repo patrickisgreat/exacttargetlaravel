@@ -20,7 +20,7 @@ class ET_Client extends \SoapClient
         $this->config = $this->getConfig();
         $this->xmlLoc = __DIR__ . '/ExactTargetWSDL.xml';
 
-        if ($config) {
+        if ($this->config) {
             $this->wsdlLoc = $config['defaultwsdl'];
             $this->clientId = $config['clientid'];
             $this->clientSecret = $config['clientsecret'];
