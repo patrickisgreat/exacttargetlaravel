@@ -21,12 +21,12 @@ class ET_Client extends \SoapClient
         $this->xmlLoc = __DIR__ . '/ExactTargetWSDL.xml';
 
         if ($this->config) {
-            $this->wsdlLoc = $config['defaultwsdl'];
-            $this->clientId = $config['clientid'];
-            $this->clientSecret = $config['clientsecret'];
-            $this->appsignature = $config['appsignature'];
-            if (array_key_exists('xmlloc', $config)) {
-                $this->xmlLoc = $config['xmlloc'];
+            $this->wsdlLoc = $this->config['defaultwsdl'];
+            $this->clientId = $this->config['clientid'];
+            $this->clientSecret = $this->config['clientsecret'];
+            $this->appsignature = $this->config['appsignature'];
+            if (array_key_exists('xmlloc', $this->config)) {
+                $this->xmlLoc = $this->config['xmlloc'];
             }
         } else {
             if ($params && array_key_exists('defaultwsdl', $params)) {
