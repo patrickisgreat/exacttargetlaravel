@@ -358,15 +358,13 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      *
      * /dataevents/key:{key}/rows/{primaryKeys}
      */
-    public function upsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
+    public function ($primaryKeyName, $primaryKeyValue, $data, $deKey)
     {
         $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
 
-        if (is_array($data)) {
-            $data = $this->it_serializes_data($data);
-        }
+        $values = ["values" => $data];
 
-        $request['body'] = $data;
+        $request['body'] = json_encode($values);
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
