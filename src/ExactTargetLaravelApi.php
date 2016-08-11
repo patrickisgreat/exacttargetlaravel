@@ -358,7 +358,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      *
      * /dataevents/key:{key}/rows/{primaryKeys}
      */
-    public function ($primaryKeyName, $primaryKeyValue, $data, $deKey)
+    public function upsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
     {
         $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
 
