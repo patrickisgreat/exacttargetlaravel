@@ -67,7 +67,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
     /**
      * ExactTargetLaravelApi constructor.
      */
-    function __construct()
+    function __construct($config=null)
     {
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
         $this->client = new Client();
@@ -75,7 +75,13 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         $this->fuelDeColumn = new ET_DataExtension_Column();
         $this->fuelDext = new ET_DataExtension();
         $this->etAsset = new ET_Asset();
-        $this->config = $this->getConfig();
+        if ($config === null) {
+            $this->config = $this->getConfig();
+        }
+        else {
+            $this->config = $config;
+            $this->getConfig();
+        }
         $this->clientId = $this->config['clientid'];
         $this->clientSecret = $this->config['clientsecret'];
         $this->accessToken = $this->getToken($this->clientId, $this->clientSecret, $this->getTokenUri);
@@ -465,7 +471,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         {
             return $getRes->code;
         }
-        return $getRes->message;
+        return $getRes;
     }
 
 
