@@ -608,4 +608,30 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             throw new Exception($e);
         }
     }
+
+    /**
+     * Get an Asset From the Content Portfolio
+     *
+     * @param $id int
+     *
+     * @return response
+     *
+     */
+    public function it_gets_an_asset($id)
+    {
+        $request['headers'] = [
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json',
+            'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
+        ];
+
+
+        $response = $this->client->get('www.exacttargetapis.com/asset/v1/content/assets/'.$id);
+
+        $responseBody = json_decode($response->getBody());
+
+        $responseCode = json_decode($response->getStatusCode());
+
+        return compact('responseCode', 'responseBody');
+    }
 }
