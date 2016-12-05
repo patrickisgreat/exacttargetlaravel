@@ -13,6 +13,7 @@ use FuelSdkPhp\ET_Client as ET_Client;
 use FuelSdkPhp\ET_Asset as ET_Asset;
 use FuelSdkPhp\ET_Patch as ET_Patch;
 use FuelSdkPhp\ET_Post as ET_Post;
+use FuelSdkPhp\ET_Get as ET_Get;
 use GuzzleHttp\Client as Client;
 
 
@@ -633,5 +634,36 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         $responseCode = json_decode($response->getStatusCode());
 
         return compact('responseCode', 'responseBody');
+    }
+
+    /**
+     * Get an Asset From the Content Portfolio via Web Services (SOAP)
+     *
+     * @param $id int
+     *
+     * @return response
+     *
+     */
+    public function it_gets_an_asset_soap($id)
+    {
+
+        $objectType = 'Portfolio';
+
+        $properties = [
+            'FileURL'
+        ];
+
+        $filter = [
+            'Property'       => 'CustomerKey',
+            'SimpleOperator' => 'equals',
+            'Value'      => $id
+        ];
+
+        $getSinceLastBatch = false;
+
+        $getSendsResponse = new ET_Get($this->fuel, $objectType, $properties, $filter, $getSinceLastBatch);
+
+        return $getSendsResponse;
+
     }
 }
