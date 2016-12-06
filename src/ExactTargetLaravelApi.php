@@ -600,8 +600,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             $response = new ET_Post($this->fuel, $objType, $props);
             if ($response->status == 1)
             {
-                return true;
+                return $response;
             }
+
             return $response;
         }
         catch (Exception $e)
