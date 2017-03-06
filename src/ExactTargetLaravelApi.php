@@ -92,11 +92,11 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
     public function getConfig()
     {
         //moved this from constructor so we can override instantiating with DB credentials if desired.
-        $this->fuel = new ET_Client();
         if (file_exists(__DIR__ .'/../ExactTargetLaravelConfig.php'))
         {
             $config = include __DIR__ .'/../ExactTargetLaravelConfig.php';
         }
+        $this->fuel = new ET_Client();
         return $config;
     }
 
@@ -139,28 +139,19 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
 
     /**
-     * POST
+     * PUT
      *
-     * /dataevents/key:{key}/rowset
+     * Upserts a data extension row by key.
      *
-     * Upserts a batch of data extensions rows by key.
-     *
-     * @param $keys
-     * @param $values
-     * @param Client $client
-     * @return array
+     * /dataevents/key:{key}/rows/{primaryKeys}
      */
-    public function upsertRowset($data, $dataExtensionKey)
+    public function upsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
     {
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
 
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$dataExtensionKey.'/rowset';
+        $values = ["values" => $data];
 
-        if (is_array($data))
-        {
-            $data = $this->it_serializes_data($data);
-        }
-
-        $request['body'] = $data;
+        $request['body'] = json_encode($values);
 
         $request['headers'] = [
             'Content-Type' => 'application/json',
@@ -170,17 +161,20 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         try {
             //post upsert
-            $response = $this->client->post($upsertUri, $request);
-            $responseBody = json_decode($response->getStatusCode());
-
-        } catch (BadResponseException $exception) {
-            //spit out exception if curl fails or server is angry
-            $exc = $exception->getResponse()->getBody(true);
-            echo $exc. "\n";
+            $response = $this->client->put($upsertUri, $request);
+            $responseBody = json_decode($response->getBody());
+            $responseCode = json_decode($response->getStatusCode());
 
         }
-
-        return compact('responseBody');
+        catch (BadResponseException $exception)
+        {
+            //spit out exception if curl fails or server is angry
+            $exc = $exception->getResponse()->getBody(true);
+            //echo "Oh No! Something went wrong! ".$exc;
+            //return $exc;
+            return (string) $exc;
+        }
+        return $responseBody;
     }
 
 
