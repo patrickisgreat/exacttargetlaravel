@@ -137,47 +137,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         return compact('response');
     }
 
-
-    /**
-     * PUT
-     *
-     * Upserts a data extension row by key.
-     *
-     * /dataevents/key:{key}/rows/{primaryKeys}
-     */
-    public function upsertRow($primaryKeyName, $primaryKeyValue, $data, $deKey)
-    {
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
-
-        $values = ["values" => $data];
-
-        $request['body'] = json_encode($values);
-
-        $request['headers'] = [
-            'Content-Type' => 'application/json',
-            'Accept'       => 'application/json',
-            'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
-        ];
-
-        try {
-            //post upsert
-            $response = $this->client->put($upsertUri, $request);
-            $responseBody = json_decode($response->getBody());
-            $responseCode = json_decode($response->getStatusCode());
-
-        }
-        catch (BadResponseException $exception)
-        {
-            //spit out exception if curl fails or server is angry
-            $exc = $exception->getResponse()->getBody(true);
-            //echo "Oh No! Something went wrong! ".$exc;
-            //return $exc;
-            return (string) $exc;
-        }
-        return $responseBody;
-    }
-
-
     /**
      * SOAP WDSL
      *
@@ -384,9 +343,11 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
-            echo "Oh No! Something went wrong! ".$exc;
+            //echo "Oh No! Something went wrong! ".$exc;
+            //return $exc;
+            return (string) $exc;
         }
-        return compact('responseCode');
+        return $responseBody;
     }
 
 
