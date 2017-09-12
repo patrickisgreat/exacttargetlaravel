@@ -137,6 +137,50 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         return compact('response');
     }
 
+     /**
+     * POST
+     *
+     * /dataevents/key:{key}/rowset
+     *
+     * Upserts a batch of data extensions rows by key.
+     *
+     * @param $keys
+     * @param $values
+     * @param Client $client
+     * @return array
+     */
+    public function upsertRowset($data, $dataExtensionKey)
+    {
+
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$dataExtensionKey.'/rowset';
+
+        if (is_array($data))
+        {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
+
+        $request['headers'] = [
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+            'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
+        ];
+
+        try {
+            //post upsert
+            $response = $this->client->post($upsertUri, $request);
+            $responseBody = json_decode($response->getStatusCode());
+
+        } catch (BadResponseException $exception) {
+            //spit out exception if curl fails or server is angry
+            $exc = $exception->getResponse()->getBody(true);
+            echo $exc. "\n";
+
+        }
+
+        return compact('responseBody');
+    }
     /**
      * SOAP WDSL
      *
