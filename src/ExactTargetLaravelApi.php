@@ -237,12 +237,12 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         if ($results->status == false)
         {
-            return print 'Exception Message: '.$getRes->message."\n";
+            return $results->message;
         }
 
         if (!$results->moreResults)
         {
-            return $results;
+            return $results->results;
         }
         else {
             $moreResults = [];
