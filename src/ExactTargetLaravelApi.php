@@ -175,7 +175,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
-            echo $exc. "\n";
+            echo $exc. '\n';
 
         }
 
@@ -208,7 +208,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             return $getRes->code;
         }
 
-        return print 'Message: '.$getRes->code."\n";
+        return print 'Message: '.$getRes->code.'\n';
     }
 
 
@@ -234,7 +234,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             return $getResult->results;
         }
 
-        return print 'Message: '.$getResult->message."\n";
+        return print 'Message: '.$getResult->message.'\n';
     }
 
     /**
@@ -294,7 +294,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
 
         while ($results->moreResults)
-        {   
+        {
             $moreResults[] = $fuelDe->GetMoreResults();
         }
 
@@ -335,11 +335,11 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             //chain logic to the response (can fire from other classes or set booleans)
                 function(ResponseInterface $res)
                 {
-                    $response = $res->getStatusCode() . "\n";
+                    $response = $res->getStatusCode() . '\n';
                 },
                 function(RequestException $e)
                 {
-                    $response = $e->getMessage() . "\n";
+                    $response = $e->getMessage() . '\n';
                     $responseMethod = $e->getRequest()->getMethod();
                 }
             );
@@ -366,7 +366,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
     {
         $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$deKey.'/rows/'.$primaryKeyName.':'.$primaryKeyValue;
 
-        $values = ["values" => $data];
+        $values = ['values' => $data];
 
         $request['body'] = json_encode($values);
 
@@ -387,7 +387,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
-            //echo "Oh No! Something went wrong! ".$exc;
+            //echo 'Oh No! Something went wrong! '.$exc;
             //return $exc;
             return (string) $exc;
         }
@@ -429,11 +429,11 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             //chain logic to the response (can fire from other classes or set booleans)
                 function(ResponseInterface $res)
                 {
-                    echo $res->getStatusCode() . "\n";
+                    echo $res->getStatusCode() . '\n';
                 },
                 function(RequestException $e)
                 {
-                    echo $e->getMessage() . "\n";
+                    echo $e->getMessage() . '\n';
                     echo $e->getRequest()->getMethod();
                 }
             );
@@ -443,7 +443,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
-            echo "Oh No! Something went wrong! ".$exc;
+            echo 'Oh No! Something went wrong! '.$exc;
         }
 
         return compact('promise');
@@ -493,8 +493,8 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         ];
 
         $request['body'] = json_encode([
-            "email" => $email,
-            "validators" => ["SyntaxValidator", "MXValidator", "ListDetectiveValidator"]
+            'email' => $email,
+            'validators' => ['SyntaxValidator', 'MXValidator', 'ListDetectiveValidator']
         ]);
 
         $response = $this->client->post('https://www.exacttargetapis.com/address/v1/validateEmail', $request);
@@ -521,8 +521,8 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         {
 
             $this->fuelDext->props = [
-                "Name" => $k,
-                "CustomerKey" => $k
+                'Name' => $k,
+                'CustomerKey' => $k
             ];
 
             $this->fuelDext->columns = [];
@@ -539,7 +539,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             }
             catch (Exception $e)
             {
-                return 'Message: '.$getRes->message."\n";
+                return 'Message: '.$getRes->message.'\n';
             }
         }
         return compact('getRes');
@@ -556,7 +556,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             return $getRes->code;
         }
         catch (Exception $e) {
-            return 'Message: '.$getRes->message."\n";
+            return 'Message: '.$getRes->message.'\n';
         }
 
     }
@@ -572,13 +572,13 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         ftp_pasv($conn_id, true);
 
-        if (ftp_chdir($conn_id, "Import") && ftp_put($conn_id, $remoteFilePath, $localFilePath, FTP_BINARY))
+        if (ftp_chdir($conn_id, 'Import') && ftp_put($conn_id, $remoteFilePath, $localFilePath, FTP_BINARY))
         {
             ftp_close($conn_id);
             return true;
         }
 
-        echo "There was a problem while uploading $file\n";
+        echo 'There was a problem while uploading $file\n';
         ftp_close($conn_id);
         return false;
     }
@@ -586,7 +586,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
     /**
      * Transfer a File from FTP to Exact Target Portfolio
      *
-     * @param $props array("filePath" => $_SERVER['PWD'] . '/sample-asset-TestFilePath.txt');
+     * @param $props array('filePath' => $_SERVER['PWD'] . '/sample-asset-TestFilePath.txt');
      * see tests for expected array structure of $props
      * @return true
      *
@@ -665,5 +665,53 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         return $getSendsResponse;
 
+    }
+
+    /**
+     * @param $email
+     * @param $first_name
+     * @param $last_name
+     * @param $custKey
+     * @return ResponseInterface|\Psr\Http\Message\StreamInterface
+     */
+    public function trigger_send($email, $first_name, $last_name, $custKey)
+    {
+        $triggerUri = 'https://www.exacttargetapis.com/messaging/v1/messageDefinitionSends/key:'.$custKey.'/send';
+
+        $request['headers'] = [
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json',
+            'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
+        ];
+
+        $request['body'] = json_encode([
+            "From" => [
+                "Address" => 'test@test.com',
+                "Name" => 'test'
+            ],
+            "To" => [
+                "Address" => $email,
+                "SubscriberKey" => $email
+            ],
+            "Options" => [
+                "RequestType" => "SYNC"
+            ]
+        ]);
+
+        try {
+            //post upsert
+            $this->client->post($triggerUri, $request);
+            $response = $this->client->post($triggerUri, $request);
+            $response = $response->getBody();
+
+            return $response;
+
+        } catch (BadResponseException $exception) {
+            //spit out exception if curl fails or server is angry
+            $exc = $exception->getResponse()->getBody(true);
+
+            return $exc;
+
+        }
     }
 }
