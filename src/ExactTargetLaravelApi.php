@@ -81,7 +81,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         }
         else {
             $this->config = $config;
-            $this->getConfig();
+            //$this->getConfig();
         }
         $this->clientId = $this->config['clientid'];
         $this->clientSecret = $this->config['clientsecret'];
