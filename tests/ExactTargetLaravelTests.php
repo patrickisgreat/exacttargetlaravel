@@ -103,8 +103,7 @@ class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
     public function testGetRows()
     {
         $test = $this->api->getRows('ETApiTest');
-        dd($test);
-        $this->assertFalse($test->isEmpty());
+        $this->assertEquals(200, $test['responseCode']);
     }
 
     /**
@@ -115,7 +114,7 @@ class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
         $values = ['emailAddress' => 'nothing@nothing.com'];
         $test = $this->api->upsertRow('primaryKey', '2', $values, 'ETApiTest');
         $delete = $this->api->deleteRow('ETApiTest', ['primaryKey' => 2]);
-        $this->assertEquals(200, $test->responseCode);
+        $this->assertEquals(200, $test);
     }
 
     public function testCreateRow()
