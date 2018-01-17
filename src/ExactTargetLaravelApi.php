@@ -286,6 +286,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         if (!$results->moreResults)
         {
+            $results->results['responseCode'] = $results->responseCode;
             return $results->results;
         }
         else {
