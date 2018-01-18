@@ -162,12 +162,14 @@ class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
 
     public function testTriggerSend()
     {
-        $email = "test@test.com";
-        $first_name = "Chester";
-        $last_name = "Tester";
+        $email = "digitaladditive.5ae940f.new@emailtests.com";
+        $first_name = "";
+        $last_name = "";
         $custKey = "EtApiLibTest";
 
         $test = $this->api->trigger_send($email, $first_name, $last_name, $custKey);
+        
+        $this->assertTrue($test->responses[0]->hasErrors === false);
     }
 
     // you can reEnable these test in an env that has FTP installed. My simple CI environment doesn't allow FTP
