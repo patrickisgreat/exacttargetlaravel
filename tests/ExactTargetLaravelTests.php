@@ -168,7 +168,7 @@ class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
         $custKey = "EtApiLibTest";
 
         $test = $this->api->trigger_send($email, $first_name, $last_name, $custKey);
-        
+
         $this->assertTrue($test->responses[0]->hasErrors === false);
     }
 
