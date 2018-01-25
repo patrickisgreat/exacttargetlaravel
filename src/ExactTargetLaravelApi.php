@@ -702,10 +702,10 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         try {
             //post upsert
             $this->client->post($triggerUri, $request);
-            $response = $this->client->post($triggerUri, $request);
-            $response = $response->getBody();
+            $request = $this->client->post($triggerUri, $request);
+            $response = $request->getBody()->getContents();
 
-            return $response;
+            return json_decode($response);
 
         } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
