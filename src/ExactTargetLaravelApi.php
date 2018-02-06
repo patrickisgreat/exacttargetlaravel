@@ -255,55 +255,59 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      *  Response from ET
      */
    public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='')
-    {
-        //get column names from DE
-        $deColumns = $this->getDeColumns($deName);
-
-        //new up & auth up ET Fuel
-        $this->fuelDe->authStub = $this->fuel;
-
-        $this->fuelDe->Name = $deName;
-
-        //build array of Column names from DE
-        foreach ($deColumns as $k => $v)
         {
-            $this->fuelDe->props[] = $v->Name;
-        }
+            //get column names from DE
+            $deColumns = $this->getDeColumns($deName);
 
-        //if the function is called with these values -- filter by them
-        if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '')
-        {
-            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals', 'Value' => $keyValue);
-        }
-        else if ($keyValue !== '' && $keyName !== '' && $simpleOperator != '')
-        {
-            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => $simpleOperator, 'Value' => $keyValue);
-        }
+            //new up & auth up ET Fuel
+            $this->fuelDe->authStub = $this->fuel;
 
-        //get rows from the columns
-        $results = $this->fuelDe->get();
+            $this->fuelDe->Name = $deName;
 
-        if ($results->status == false)
-        {
-            return $results->message;
+            //build array of Column names from DE
+            foreach ($deColumns as $k => $v)
+            {
+                $this->fuelDe->props[] = $v->Name;
+            }
+
+            //if the function is called with these values -- filter by them
+            if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '')
+            {
+                $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals', 'Value' => $keyValue);
+            }
+            else if ($keyValue !== '' && $keyName !== '' && $simpleOperator != '')
+            {
+                $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => $simpleOperator, 'Value' => $keyValue);
+            }
+
+            //get rows from the columns
+            $results = $this->fuelDe->get();
+
+            if ($results->status == false)
+            {
+                return $results->message;
+            }
+
+            if (!$results->moreResults)
+            {
+                return $results->results;
+            }
+            else {
+                $moreResults = [];
+            }
+
+
+            while ($results->moreResults)
+            {
+                $moreResults[] = $this->fuelDe->GetMoreResults();
+                echo "more than 2500 results chunking";
+                echo "\n";
+                echo count($moreResults);
+                echo "\n";
+            }
+
+            return $moreResults;
         }
-
-        if (!$results->moreResults)
-        {
-            return $results->results;
-        }
-        else {
-            $moreResults = [];
-        }
-
-
-        while ($results->moreResults)
-        {
-            $moreResults[] = $fuelDe->GetMoreResults();
-        }
-
-        return $moreResults;
-    }
 
 
     /**
