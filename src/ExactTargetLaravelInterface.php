@@ -72,17 +72,6 @@ interface ExactTargetLaravelInterface {
      */
     public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='');
 
-    /**
-     * POST
-     *
-     * Asynchronously upserts a batch of data extensions rows by key.
-     *
-     * these async methods need testing when / if we have a need for async requests (which we will)
-     *
-     * /dataeventsasync/key:{key}/rowset
-     *
-     */
-    public function asyncUpsertRowset($values, $deKey);
 
     /**
      * PUT
