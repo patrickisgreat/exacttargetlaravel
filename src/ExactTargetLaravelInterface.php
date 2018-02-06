@@ -70,7 +70,7 @@ interface ExactTargetLaravelInterface {
      * @return array
      *  Response from ET
      */
-    public function getRows($deName, $keyName='', $primaryKey='');
+    public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='');
 
     /**
      * POST
