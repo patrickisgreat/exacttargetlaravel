@@ -103,7 +103,7 @@ class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
     public function testGetRows()
     {
         $test = $this->api->getRows('ETApiTest');
-        $this->assertEquals(200, $test['responseCode']);
+        $this->assertTrue(is_object($test[0]));
     }
 
     /**
