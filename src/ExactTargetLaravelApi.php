@@ -254,106 +254,60 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      * @return array
      *  Response from ET
      */
-    public function getRows($deName, $keyName='', $primaryKey='')
-    {
-        //get column names from DE
-        $deColumns = $this->getDeColumns($deName);
-
-        //new up & auth up ET Fuel
-        $this->fuelDe->authStub = $this->fuel;
-
-        $this->fuelDe->Name = $deName;
-
-        //build array of Column names from DE
-        foreach ($deColumns as $k => $v)
+   public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='')
         {
-            $this->fuelDe->props[] = $v->Name;
+            //get column names from DE
+            $deColumns = $this->getDeColumns($deName);
+
+            //new up & auth up ET Fuel
+            $this->fuelDe->authStub = $this->fuel;
+
+            $this->fuelDe->Name = $deName;
+
+            //build array of Column names from DE
+            foreach ($deColumns as $k => $v)
+            {
+                $this->fuelDe->props[] = $v->Name;
+            }
+
+            //if the function is called with these values -- filter by them
+            if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '')
+            {
+                $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals', 'Value' => $keyValue);
+            }
+            else if ($keyValue !== '' && $keyName !== '' && $simpleOperator != '')
+            {
+                $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => $simpleOperator, 'Value' => $keyValue);
+            }
+
+            //get rows from the columns
+            $results = $this->fuelDe->get();
+
+            if ($results->status == false)
+            {
+                return $results->message;
+            }
+
+            if (!$results->moreResults)
+            {
+                return $results->results;
+            }
+            else {
+                $moreResults = [];
+            }
+
+
+            while ($results->moreResults)
+            {
+                $moreResults[] = $this->fuelDe->GetMoreResults();
+                echo "more than 2500 results chunking";
+                echo "\n";
+                echo count($moreResults);
+                echo "\n";
+            }
+
+            return $moreResults;
         }
-
-        //if the function is called with these values -- filter by them
-        if ($primaryKey !== '' && $keyName !== '')
-        {
-            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals','Value' => $primaryKey);
-        }
-
-        //get rows from the columns
-        $results = $this->fuelDe->get();
-
-        if ($results->status == false)
-        {
-            return $results->message;
-        }
-
-        if (!$results->moreResults)
-        {
-            $results->results['responseCode'] = $results->code;
-            return $results->results;
-        }
-        else {
-            $moreResults = [];
-        }
-
-
-        while ($results->moreResults)
-        {
-            $moreResults[] = $fuelDe->GetMoreResults();
-        }
-
-        return $moreResults;
-    }
-
-    /**
-     * POST
-     *
-     * Asynchronously upserts a batch of data extensions rows by key.
-     *
-     * these async methods need testing when / if we have a need for async requests (which we will)
-     *
-     * /dataeventsasync/key:{key}/rowset
-     *
-     */
-    public function asyncUpsertRowset($data, $deKey)
-    {
-        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rowset';
-
-        if (is_array($data))
-        {
-            $data = $this->it_serializes_data($data);
-        }
-
-        $request['body'] = $data;
-
-        $request['headers'] = [
-            'Content-Type' => 'application/json',
-            'Accept'       => 'application/json',
-            'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
-        ];
-
-        try {
-            //post upsert
-            $promise = $this->client->postAsync($upsertUri, $request);
-            $promise->then(
-            //chain logic to the response (can fire from other classes or set booleans)
-                function(ResponseInterface $res)
-                {
-                    $response = $res->getStatusCode() . '\n';
-                },
-                function(RequestException $e)
-                {
-                    $response = $e->getMessage() . '\n';
-                    $responseMethod = $e->getRequest()->getMethod();
-                }
-            );
-            $promise->wait();
-        }
-        catch (BadResponseException $exception)
-        {
-            //spit out exception if curl fails or server is angry
-            $exc = $exception->getResponse()->getBody(true);
-            echo $exc;
-
-        }
-    }
 
 
     /**
@@ -714,5 +668,20 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             return $exc;
 
         }
+    }
+
+    public function get_sends()
+    {
+
+    }
+
+    public function get_clicks()
+    {
+
+    }
+
+    public function get_opens()
+    {
+
     }
 }
