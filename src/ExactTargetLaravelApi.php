@@ -294,16 +294,14 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             }
             else {
                 $moreResults = [];
+                $moreResult[] = $results->results;
             }
 
 
             while ($results->moreResults)
             {
-                $moreResults[] = $this->fuelDe->GetMoreResults();
-                echo "more than 2500 results chunking";
-                echo "\n";
-                echo count($moreResults);
-                echo "\n";
+                $results = $this->fuelDe->getMoreResults();
+                $moreResults[] = $results->results;
             }
 
             return $moreResults;
