@@ -294,7 +294,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             }
             else {
                 $moreResults = [];
-                $moreResult[] = $results->results;
+                $moreResults[] = $results->results;
             }
 
 
