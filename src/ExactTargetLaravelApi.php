@@ -175,7 +175,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
-            echo $exc. '\n';
+            echo $exc;
+            return $exc;
+
 
         }
 
