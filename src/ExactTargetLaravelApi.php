@@ -87,6 +87,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         $this->accessToken = $this->getToken($this->clientId, $this->clientSecret, $this->getTokenUri);
     }
 
+    /**
+     * @return bool|mixed
+     */
     public function getConfig()
     {
         $config = false;
@@ -457,6 +460,27 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
 
 
     /**
+     * @param $deName
+     * @param $props
+     * @return ET_Patch|int
+     */
+    public function patchRow($deName, $props)
+    {
+
+        $this->fuelDe->authStub = $this->fuel;
+
+        $this->fuelDe->Name = $deName;
+
+        $this->fuelDe->props = $props;
+
+        $getRes = $this->fuelDe->patch();
+
+        if ($getRes->status == true) {
+            return $getRes->code;
+        }
+        return $getRes;
+    }
+    /**
      * POST
      *
      * To validate an email address, perform an HTTP POST specifying the email address and validators
@@ -520,6 +544,10 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         return compact('getRes');
     }
 
+    /**
+     * @param $props
+     * @return int|string
+     */
     public function deleteDe($props)
     {
         $this->fuelDext->authStub = $this->fuel;

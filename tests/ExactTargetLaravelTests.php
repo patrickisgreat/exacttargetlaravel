@@ -56,6 +56,9 @@ class ExactTargetLaravelTests extends TestCase
         $this->assertTrue(is_array($test));
     }
 
+    /**
+     *
+     */
     public function testUpsertRowsetArray()
     {
         $array = [
@@ -119,6 +122,9 @@ class ExactTargetLaravelTests extends TestCase
         $this->assertEquals(200, $test);
     }
 
+    /**
+     * Test Creating a new Row in a DE
+     */
     public function testCreateRow()
     {
         $props = [
@@ -130,6 +136,27 @@ class ExactTargetLaravelTests extends TestCase
         $this->assertEquals(200, $test);
     }
 
+    /**
+     * Test Patching an existing Row in a DE
+     */
+    public function testPatchRow()
+    {
+        $props = [
+            'primaryKey' => 9,
+            'emailAddress' => 'nothing@nothing.com'
+        ];
+        $createTestRow = $this->api->createRow('ETApiTest', $props);
+        $testPatch = $this->api->patchRow('ETApiTest', [
+            'primaryKey' => 9,
+            'emailAddress' => 'newaddress@newaddress.com'
+        ]);
+        $delete = $this->api->deleteRow('ETApiTest', ['primaryKey' => 9]);
+        $this->assertEquals(200, $testPatch);
+    }
+
+    /**
+     *
+     */
     public function testValidateEmail()
     {
         $email = 'test@test.com';
@@ -137,6 +164,9 @@ class ExactTargetLaravelTests extends TestCase
         $this->assertEquals(200, $test['responseCode']);
     }
 
+    /**
+     *
+     */
     public function testCreateDe()
     {
         //Data Extension Names && Columns
@@ -153,6 +183,9 @@ class ExactTargetLaravelTests extends TestCase
 
     }
 
+    /**
+     *
+     */
     public function testDeleteDe()
     {
         $props = ["Name" => 'TestDE'];
