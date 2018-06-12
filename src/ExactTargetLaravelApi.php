@@ -248,7 +248,8 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
      * @return array
      *  Response from ET
      */
-    public function getRows($deName, $keyName='', $primaryKey='')
+
+    public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='')
     {
         //get column names from DE
         $deColumns = $this->getDeColumns($deName);
@@ -264,8 +265,13 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         }
 
         //if the function is called with these values -- filter by them
-        if ($primaryKey !== '' && $keyName !== '') {
-            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals','Value' => $primaryKey);
+        if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '')
+        {
+            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals', 'Value' => $keyValue);
+        }
+        else if ($keyValue !== '' && $keyName !== '' && $simpleOperator != '')
+        {
+            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => $simpleOperator, 'Value' => $keyValue);
         }
 
         //get rows from the columns
