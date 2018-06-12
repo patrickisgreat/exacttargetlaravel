@@ -3,14 +3,16 @@
 namespace digitaladditive\ExactTargetLaravel\Test;
 
 use digitaladditive\ExactTargetLaravel\ExactTargetLaravelApi as ExactTargetLaravelApi;
+use PHPUnit\Framework\TestCase;
 
-class ExactTargetLaravelTests extends \PHPUnit_Framework_TestCase
+class ExactTargetLaravelTests extends TestCase
 {
     /**
      * ExactTargetLaravelTests constructor.
      */
     public function __construct()
     {
+        parent::__construct();
         $this->api = new ExactTargetLaravelApi();
     }
 

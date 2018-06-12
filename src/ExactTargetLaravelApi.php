@@ -93,9 +93,10 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         //moved this from constructor so we can override instantiating with DB credentials if desired.
         if (file_exists(__DIR__ .'/../ExactTargetLaravelConfig.php')) {
             $config = include __DIR__ .'/../ExactTargetLaravelConfig.php';
-            $this->fuel = new ET_Client(true);
+            $this->fuel = new ET_Client(false, false, $config);
             return $config;
         }
+
         return $config;
     }
 
