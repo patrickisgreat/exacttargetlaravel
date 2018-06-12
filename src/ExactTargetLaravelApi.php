@@ -3,19 +3,18 @@
 namespace digitaladditive\ExactTargetLaravel;
 
 use GuzzleHttp\Exception\BadResponseException as BadResponseException;
-use FuelSdkPhp\ET_DataExtension_Column as ET_DataExtension_Column;
+use FuelSdk\ET_DataExtension_Column as ET_DataExtension_Column;
 use GuzzleHttp\Exception\RequestException as RequestException;
-use FuelSdkPhp\ET_DataExtension_Row as ET_DataExtension_Row;
+use FuelSdk\ET_DataExtension_Row as ET_DataExtension_Row;
 use Psr\Http\Message\ResponseInterface as ResponseInterface;
-use FuelSdkPhp\ET_DataExtension as ET_DataExtension;
+use FuelSdk\ET_DataExtension as ET_DataExtension;
 use GuzzleHttp\Psr7\Request as Request;
-use FuelSdkPhp\ET_Client as ET_Client;
-use FuelSdkPhp\ET_Asset as ET_Asset;
-use FuelSdkPhp\ET_Patch as ET_Patch;
-use FuelSdkPhp\ET_Post as ET_Post;
-use FuelSdkPhp\ET_Get as ET_Get;
+use FuelSdk\ET_Client as ET_Client;
+use FuelSdk\ET_Asset as ET_Asset;
+use FuelSdk\ET_Patch as ET_Patch;
+use FuelSdk\ET_Post as ET_Post;
+use FuelSdk\ET_Get as ET_Get;
 use GuzzleHttp\Client as Client;
-
 
 /**
  *
@@ -24,8 +23,8 @@ use GuzzleHttp\Client as Client;
  * @package App
  *
  */
-class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
-
+class ExactTargetLaravelApi implements ExactTargetLaravelInterface
+{
     use SerializeDataTrait;
 
     /**
@@ -68,7 +67,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
     /**
      * ExactTargetLaravelApi constructor.
      */
-    function __construct($config=null)
+    public function __construct($config=null)
     {
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
         $this->client = new Client();
@@ -76,27 +75,28 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         $this->fuelDeColumn = new ET_DataExtension_Column();
         $this->fuelDext = new ET_DataExtension();
         $this->etAsset = new ET_Asset();
+        //allows you to pull this from a database with your own implementations
         if ($config === null) {
             $this->config = $this->getConfig();
-        }
-        else {
+        } else {
             $this->config = $config;
             //$this->getConfig();
         }
         $this->clientId = $this->config['clientid'];
         $this->clientSecret = $this->config['clientsecret'];
         $this->accessToken = $this->getToken($this->clientId, $this->clientSecret, $this->getTokenUri);
-
     }
 
     public function getConfig()
     {
+        $config = false;
         //moved this from constructor so we can override instantiating with DB credentials if desired.
-        if (file_exists(__DIR__ .'/../ExactTargetLaravelConfig.php'))
-        {
+        if (file_exists(__DIR__ .'/../ExactTargetLaravelConfig.php')) {
             $config = include __DIR__ .'/../ExactTargetLaravelConfig.php';
+            $this->fuel = new ET_Client(false, false, $config);
+            return $config;
         }
-        $this->fuel = new ET_Client();
+
         return $config;
     }
 
@@ -137,25 +137,23 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         return compact('response');
     }
 
-     /**
-     * POST
-     *
-     * /dataevents/key:{key}/rowset
-     *
-     * Upserts a batch of data extensions rows by key.
-     *
-     * @param $keys
-     * @param $values
-     * @param Client $client
-     * @return array
-     */
+    /**
+    * POST
+    *
+    * /dataevents/key:{key}/rowset
+    *
+    * Upserts a batch of data extensions rows by key.
+    *
+    * @param $keys
+    * @param $values
+    * @param Client $client
+    * @return array
+    */
     public function upsertRowset($data, $dataExtensionKey)
     {
-
         $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataevents/key:'.$dataExtensionKey.'/rowset';
 
-        if (is_array($data))
-        {
+        if (is_array($data)) {
             $data = $this->it_serializes_data($data);
         }
 
@@ -171,14 +169,10 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             //post upsert
             $response = $this->client->post($upsertUri, $request);
             $responseBody = json_decode($response->getStatusCode());
-
         } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
-            echo $exc;
-            return $exc;
-
-
+            echo $exc. '\n';
         }
 
         return compact('responseBody');
@@ -205,8 +199,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         $getRes = $this->fuelDe->delete();
 
-        if ($getRes->status == true)
-        {
+        if ($getRes->status == true) {
             return $getRes->code;
         }
 
@@ -231,8 +224,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         $getResult = $this->fuelDeColumn->get();
 
-        if ($getResult->status == true)
-        {
+        if ($getResult->status == true) {
             return $getResult->results;
         }
 
@@ -256,58 +248,100 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      * @return array
      *  Response from ET
      */
-   public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='')
-        {
-            //get column names from DE
-            $deColumns = $this->getDeColumns($deName);
 
-            //new up & auth up ET Fuel
-            $this->fuelDe->authStub = $this->fuel;
+    public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='')
+    {
+        //get column names from DE
+        $deColumns = $this->getDeColumns($deName);
 
-            $this->fuelDe->Name = $deName;
+        //new up & auth up ET Fuel
+        $this->fuelDe->authStub = $this->fuel;
 
-            //build array of Column names from DE
-            foreach ($deColumns as $k => $v)
-            {
-                $this->fuelDe->props[] = $v->Name;
-            }
+        $this->fuelDe->Name = $deName;
 
-            //if the function is called with these values -- filter by them
-            if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '')
-            {
-                $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals', 'Value' => $keyValue);
-            }
-            else if ($keyValue !== '' && $keyName !== '' && $simpleOperator != '')
-            {
-                $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => $simpleOperator, 'Value' => $keyValue);
-            }
-
-            //get rows from the columns
-            $results = $this->fuelDe->get();
-
-            if ($results->status == false)
-            {
-                return $results->message;
-            }
-
-            if (!$results->moreResults)
-            {
-                return $results->results;
-            }
-            else {
-                $moreResults = [];
-                $moreResults[] = $results->results;
-            }
-
-
-            while ($results->moreResults)
-            {
-                $results = $this->fuelDe->getMoreResults();
-                $moreResults[] = $results->results;
-            }
-
-            return $moreResults;
+        //build array of Column names from DE
+        foreach ($deColumns as $k => $v) {
+            $this->fuelDe->props[] = $v->Name;
         }
+
+        //if the function is called with these values -- filter by them
+        if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '')
+        {
+            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals', 'Value' => $keyValue);
+        }
+        else if ($keyValue !== '' && $keyName !== '' && $simpleOperator != '')
+        {
+            $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => $simpleOperator, 'Value' => $keyValue);
+        }
+
+        //get rows from the columns
+        $results = $this->fuelDe->get();
+
+        if ($results->status == false) {
+            return $results->message;
+        }
+
+        if (!$results->moreResults) {
+            $results->results['responseCode'] = $results->code;
+            return $results->results;
+        } else {
+            $moreResults = [];
+        }
+
+
+        while ($results->moreResults) {
+            $moreResults[] = $fuelDe->GetMoreResults();
+        }
+
+        return $moreResults;
+    }
+
+    /**
+     * POST
+     *
+     * Asynchronously upserts a batch of data extensions rows by key.
+     *
+     * these async methods need testing when / if we have a need for async requests (which we will)
+     *
+     * /dataeventsasync/key:{key}/rowset
+     *
+     */
+    public function asyncUpsertRowset($data, $deKey)
+    {
+        $upsertUri = 'https://www.exacttargetapis.com/hub/v1/dataeventsasync/key:'.$deKey.'/rowset';
+
+        if (is_array($data)) {
+            $data = $this->it_serializes_data($data);
+        }
+
+        $request['body'] = $data;
+
+        $request['headers'] = [
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+            'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
+        ];
+
+        try {
+            //post upsert
+            $promise = $this->client->postAsync($upsertUri, $request);
+            $promise->then(
+            //chain logic to the response (can fire from other classes or set booleans)
+                function (ResponseInterface $res) {
+                    $response = $res->getStatusCode() . '\n';
+                },
+                function (RequestException $e) {
+                    $response = $e->getMessage() . '\n';
+                    $responseMethod = $e->getRequest()->getMethod();
+                }
+            );
+            $promise->wait();
+        } catch (BadResponseException $exception) {
+            //spit out exception if curl fails or server is angry
+            $exc = $exception->getResponse()->getBody(true);
+            echo $exc;
+        }
+    }
 
 
     /**
@@ -336,10 +370,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             $response = $this->client->put($upsertUri, $request);
             $responseBody = json_decode($response->getBody());
             $responseCode = json_decode($response->getStatusCode());
-
-        }
-        catch (BadResponseException $exception)
-        {
+        } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
             //echo 'Oh No! Something went wrong! '.$exc;
@@ -382,20 +413,16 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
             $promise = $this->client->putAsync($upsertUri, $request);
             $promise->then(
             //chain logic to the response (can fire from other classes or set booleans)
-                function(ResponseInterface $res)
-                {
+                function (ResponseInterface $res) {
                     echo $res->getStatusCode() . '\n';
                 },
-                function(RequestException $e)
-                {
+                function (RequestException $e) {
                     echo $e->getMessage() . '\n';
                     echo $e->getRequest()->getMethod();
                 }
             );
             $promise->wait();
-        }
-        catch (BadResponseException $exception)
-        {
+        } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
             echo 'Oh No! Something went wrong! '.$exc;
@@ -422,8 +449,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         $getRes = $this->fuelDe->post();
 
-        if ($getRes->status == true)
-        {
+        if ($getRes->status == true) {
             return $getRes->code;
         }
         return $getRes;
@@ -472,9 +498,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
     {
         $this->fuelDext->authStub = $this->fuel;
 
-        foreach ($deStructures as $k => $name)
-        {
-
+        foreach ($deStructures as $k => $name) {
             $this->fuelDext->props = [
                 'Name' => $k,
                 'CustomerKey' => $k
@@ -482,18 +506,14 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
             $this->fuelDext->columns = [];
 
-            foreach ($name as $key => $val)
-            {
+            foreach ($name as $key => $val) {
                 $this->fuelDext->columns[] = $val;
             }
-            try
-            {
+            try {
                 $getRes = $this->fuelDext->post();
 
                 return $getRes->code;
-            }
-            catch (Exception $e)
-            {
+            } catch (Exception $e) {
                 return 'Message: '.$getRes->message.'\n';
             }
         }
@@ -509,11 +529,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         try {
             $getRes = $this->fuelDext->delete();
             return $getRes->code;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return 'Message: '.$getRes->message.'\n';
         }
-
     }
 
     /**
@@ -527,8 +545,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         ftp_pasv($conn_id, true);
 
-        if (ftp_chdir($conn_id, 'Import') && ftp_put($conn_id, $remoteFilePath, $localFilePath, FTP_BINARY))
-        {
+        if (ftp_chdir($conn_id, 'Import') && ftp_put($conn_id, $remoteFilePath, $localFilePath, FTP_BINARY)) {
             ftp_close($conn_id);
             return true;
         }
@@ -552,15 +569,12 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
 
         try {
             $response = new ET_Post($this->fuel, $objType, $props);
-            if ($response->status == 1)
-            {
+            if ($response->status == 1) {
                 return $response;
             }
 
             return $response;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             throw new Exception($e);
         }
     }
@@ -601,7 +615,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
      */
     public function it_gets_an_asset_soap($id)
     {
-
         $objectType = 'Portfolio';
 
         $properties = [
@@ -619,7 +632,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         $getSendsResponse = new ET_Get($this->fuel, $objectType, $properties, $filter, $getSinceLastBatch);
 
         return $getSendsResponse;
-
     }
 
     /**
@@ -656,32 +668,15 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface {
         try {
             //post upsert
             $this->client->post($triggerUri, $request);
-            $request = $this->client->post($triggerUri, $request);
-            $response = $request->getBody()->getContents();
+            $response = $this->client->post($triggerUri, $request);
+            $response = $response->getBody();
 
-            return json_decode($response);
-
+            return $response;
         } catch (BadResponseException $exception) {
             //spit out exception if curl fails or server is angry
             $exc = $exception->getResponse()->getBody(true);
 
             return $exc;
-
         }
-    }
-
-    public function get_sends()
-    {
-
-    }
-
-    public function get_clicks()
-    {
-
-    }
-
-    public function get_opens()
-    {
-
     }
 }
