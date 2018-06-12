@@ -102,6 +102,13 @@ interface ExactTargetLaravelInterface {
     public function createRow($deName, $props);
 
     /**
+     * @param $deName
+     * @param $props
+     * @return ET_Patch|int
+     */
+    public function patchRow($deName, $props);
+
+    /**
      * POST
      *
      * To validate an email address, perform an HTTP POST specifying the email address and validators
@@ -132,8 +139,6 @@ interface ExactTargetLaravelInterface {
      * @return array (response)
      */
     public function it_creates_a_portfolio_file($props);
-
-
 
 
 }
