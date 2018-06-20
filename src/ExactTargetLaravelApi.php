@@ -268,12 +268,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         }
 
         //if the function is called with these values -- filter by them
-        if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '')
-        {
+        if ($keyValue !== '' && $keyName !== '' && $simpleOperator == '') {
             $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => 'equals', 'Value' => $keyValue);
-        }
-        else if ($keyValue !== '' && $keyName !== '' && $simpleOperator != '')
-        {
+        } elseif ($keyValue !== '' && $keyName !== '' && $simpleOperator != '') {
             $this->fuelDe->filter = array('Property' => $keyName, 'SimpleOperator' => $simpleOperator, 'Value' => $keyValue);
         }
 
@@ -284,19 +281,9 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
             return $results->message;
         }
 
-        if (!$results->moreResults) {
-            $results->results['responseCode'] = $results->code;
-            return $results->results;
-        } else {
-            $moreResults = [];
-        }
-
-
-        while ($results->moreResults) {
-            $moreResults[] = $fuelDe->GetMoreResults();
-        }
-
-        return $moreResults;
+        $results->results['responseCode'] = $results->code;
+        $results->moreResults = $results->moreResults;
+        return $results->results;
     }
 
     /**
@@ -466,7 +453,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
      */
     public function patchRow($deName, $props)
     {
-
         $this->fuelDe->authStub = $this->fuel;
 
         $this->fuelDe->Name = $deName;
