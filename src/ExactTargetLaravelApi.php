@@ -282,7 +282,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         }
 
         $results->results['responseCode'] = $results->code;
-        $results->moreResults = $results->moreResults;
+        $results->results['moreResults'] = $results->moreResults;
         return $results->results;
     }
 
