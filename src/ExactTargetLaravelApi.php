@@ -2,19 +2,19 @@
 
 namespace digitaladditive\ExactTargetLaravel;
 
-use GuzzleHttp\Exception\BadResponseException as BadResponseException;
-use FuelSdk\ET_DataExtension_Column as ET_DataExtension_Column;
-use GuzzleHttp\Exception\RequestException as RequestException;
-use FuelSdk\ET_DataExtension_Row as ET_DataExtension_Row;
-use Psr\Http\Message\ResponseInterface as ResponseInterface;
-use FuelSdk\ET_DataExtension as ET_DataExtension;
-use GuzzleHttp\Psr7\Request as Request;
-use FuelSdk\ET_Client as ET_Client;
+use FuelSdk\ET_Get as ET_Get;
+use FuelSdk\ET_Post as ET_Post;
+use GuzzleHttp\Client as Client;
 use FuelSdk\ET_Asset as ET_Asset;
 use FuelSdk\ET_Patch as ET_Patch;
-use FuelSdk\ET_Post as ET_Post;
-use FuelSdk\ET_Get as ET_Get;
-use GuzzleHttp\Client as Client;
+use FuelSdk\ET_Client as ET_Client;
+use GuzzleHttp\Psr7\Request as Request;
+use FuelSdk\ET_DataExtension as ET_DataExtension;
+use FuelSdk\ET_DataExtension_Row as ET_DataExtension_Row;
+use Psr\Http\Message\ResponseInterface as ResponseInterface;
+use GuzzleHttp\Exception\RequestException as RequestException;
+use FuelSdk\ET_DataExtension_Column as ET_DataExtension_Column;
+use GuzzleHttp\Exception\BadResponseException as BadResponseException;
 
 /**
  *
@@ -25,7 +25,7 @@ use GuzzleHttp\Client as Client;
  */
 class ExactTargetLaravelApi implements ExactTargetLaravelInterface
 {
-    use SerializeDataTrait;
+    use SerializeDataTrait, BroadCastData;
 
     /**
      * client id
@@ -61,7 +61,7 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
      * Fuel DE Object
      * @var object
      */
-    protected $fuelDe;
+    public $fuelDe;
 
 
     /**
@@ -251,7 +251,6 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
      * @return array
      *  Response from ET
      */
-
     public function getRows($deName, $keyName='', $simpleOperator='', $keyValue='')
     {
         //get column names from DE
@@ -277,13 +276,23 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         //get rows from the columns
         $results = $this->fuelDe->get();
 
+        $firstResults = $results->results;
+
+        //if we have a model to pass result into we run this while loop
+        while ($results->moreResults) {
+            echo "getting more results";
+            echo "\n";
+            $results = $this->fuelDe->getMoreResults();
+            BroadCastData::broadcast($results->results, $deName);
+        }
+
         if ($results->status == false) {
             return $results->message;
         }
 
         $results->results['responseCode'] = $results->code;
-        $results->results['moreResults'] = $results->moreResults;
-        return $results->results;
+
+        return $firstResults;
     }
 
     /**
