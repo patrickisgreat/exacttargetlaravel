@@ -22,7 +22,7 @@
     "illuminate/support": "~5.0",
     "php": "^7.1.3",
     "guzzlehttp/guzzle": "~6.0",
-    "digitaladditive/php-fuel-sdk-fork": ">=1.2"
+    "digitaladditive/php-fuel-sdk-fork": "1.3-vacoda"
   },
   "require-dev": {
     "filp/whoops": "^2.0",
