@@ -2,12 +2,14 @@
 
 namespace digitaladditive\ExactTargetLaravel;
 
+
 use FuelSdk\ET_Get as ET_Get;
 use FuelSdk\ET_Post as ET_Post;
 use GuzzleHttp\Client as Client;
 use FuelSdk\ET_Asset as ET_Asset;
 use FuelSdk\ET_Patch as ET_Patch;
 use FuelSdk\ET_Client as ET_Client;
+use Symfony\Component\Dotenv\Dotenv;
 use GuzzleHttp\Psr7\Request as Request;
 use FuelSdk\ET_DataExtension as ET_DataExtension;
 use FuelSdk\ET_DataExtension_Row as ET_DataExtension_Row;
@@ -69,6 +71,8 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
      */
     public function __construct($config=null)
     {
+        $dotenv = new Dotenv();
+        $dotenv->load(__DIR__.'/../.env');
         $this->getTokenUri = 'https://auth.exacttargetapis.com/v1/requestToken';
         $this->client = new Client();
         $this->fuelDe = new ET_DataExtension_Row();
@@ -576,6 +580,40 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         echo 'There was a problem while uploading $file\n';
         ftp_close($conn_id);
         return false;
+    }
+
+    /**
+     * Upload a Content Builder Asset
+     *
+     * @param $json request body
+     * see test for expected array structure of $json
+     * @return $responseBody
+     *
+     */
+    public function create_content_builder_asset($json)
+    {
+        $request['headers'] = [
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json',
+            'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
+        ];
+
+        $request['body'] = $json;
+
+        try {
+            $response = $this->client->post('https://www.exacttargetapis.com/asset/v1/content/assets', $request);
+
+            $responseBody = json_decode($response->getBody());
+
+            $responseCode = json_decode($response->getStatusCode());
+
+            return compact('responseCode', 'responseBody');
+
+        } catch (BadResponseException $exception) {
+
+            return (string) $exception->getResponse()->getBody(true);
+        }
+
     }
 
     /**

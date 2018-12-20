@@ -1,0 +1,32 @@
+version: '2'
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: docker/local/app.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+  web:
+    build:
+      context: ./
+      dockerfile: docker/local/web.dockerfile
+    working_dir: /var/www
+    volumes_from:
+      - app
+    ports:
+      - 8080:80
+  ngrok:
+    container_name: ngrok
+    ports:
+      - "0.0.0.0:4040:4040"
+    image: wernight/ngrok
+    links:
+      ["web"]
+    environment:
+      - NGROK_AUTH=3SBM8HGcPJ7cbdC8nXXvh_3TKCoNfqohp9X3AhiLzed
+      - NGROK_SUBDOMAIN=jirabot
+      - NGROK_PORT=web:80
+volumes:
+  data:
+  dbdata:

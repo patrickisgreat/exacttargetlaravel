@@ -195,6 +195,31 @@ class ExactTargetLaravelTests extends TestCase
         $this->assertEquals(200, $test);
     }
 
+    public function testCreateContentBuilderAsset()
+    {
+        $test_img = file_get_contents(__DIR__.'/../test_image.jpg');
+
+        $base64EncImage = base64_encode($test_img);
+        $ext = pathinfo($this->filePath, PATHINFO_EXTENSION);
+        $json = json_encode([
+            "name" => "test_image.jpg",
+            "assetType" => [
+                "name" => $ext,
+                "id" => "28"
+            ],
+            // this maps to email folder in THD account
+            // we'll need to determine which folder(s) to use or if it even matters
+            "category" => [
+                "id" => "53169"
+            ],
+            "file" => $base64EncImage
+        ]);
+
+        $test = $this->create_content_builder_asset($json);
+
+        $this->assertEquals(201, $test);
+
+    }
 //    public function testTriggerSend()
 //    {
 //        $email = "digitaladditive.5ae940f.new@emailtests.com";

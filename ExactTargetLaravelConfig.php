@@ -1,8 +1,8 @@
 <?php
 return array(
     'appsignature' => 'none',
-    'clientid' => '',
-    'clientsecret' => '',
+    'clientid' => getenv('CLIENT_ID'),
+    'clientsecret' => getenv('CLIENT_SECRET'),
     'defaultwsdl' => 'https://webservice.exacttarget.com/etframework.wsdl',
     'xmlloc' => './ExactTargetWSDL.xml',
     'baseUrl' => 'https://www.exacttargetapis.com',
