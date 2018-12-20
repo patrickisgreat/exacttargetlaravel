@@ -582,6 +582,14 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
         return false;
     }
 
+    /**
+     * Upload a Content Builder Asset
+     *
+     * @param $json request body
+     * see test for expected array structure of $json
+     * @return $responseBody
+     *
+     */
     public function create_content_builder_asset($json)
     {
         $request['headers'] = [
@@ -590,15 +598,22 @@ class ExactTargetLaravelApi implements ExactTargetLaravelInterface
             'Authorization' => 'Bearer ' . $this->accessToken['response']->accessToken
         ];
 
-        $request['body'] = $json
+        $request['body'] = $json;
 
-        $response = $this->client->post('https://www.exacttargetapis.com/asset/v1/content/assets', $request);
+        try {
+            $response = $this->client->post('https://www.exacttargetapis.com/asset/v1/content/assets', $request);
 
-        $responseBody = json_decode($response->getBody());
+            $responseBody = json_decode($response->getBody());
 
-        $responseCode = json_decode($response->getStatusCode());
+            $responseCode = json_decode($response->getStatusCode());
 
-        return compact('responseCode', 'responseBody');
+            return compact('responseCode', 'responseBody');
+
+        } catch (BadResponseException $exception) {
+
+            return (string) $exception->getResponse()->getBody(true);
+        }
+
     }
 
     /**
